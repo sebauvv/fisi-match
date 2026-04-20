@@ -12,14 +12,18 @@ def lambda_handler(event, context):
     """
     # Si viene desde API Gateway, los datos pueden estar en body o queryStringParameters
     body = event
-    if "body" in event and isinstance(event["body"], str):
-        body = json.loads(event["body"])
+    if "body" in event:
+        raw_body = event["body"]
+        if isinstance(raw_body, bytes):
+            raw_body = raw_body.decode("utf-8")
+        if isinstance(raw_body, str):
+            body = json.loads(raw_body)
         
-    idea = body.get('thesis_idea')
+    idea = (body.get('thesis_idea') or '').strip()
     if not idea:
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": "Missing 'thesis_idea' parameter"})
+            "body": json.dumps({"error": "Missing 'thesis_idea' parameter"}, ensure_ascii=False)
         }
 
     top_k = int(body.get('top_k', 5))
@@ -40,8 +44,8 @@ def lambda_handler(event, context):
         
     if not chunks:
         return {
-            "statusCode": 200, 
-            "body": json.dumps({"message": "No results found for the given idea."})
+            "statusCode": 200,
+            "body": json.dumps({"message": "No results found for the given idea."}, ensure_ascii=False)
         }
         
     # 3. Scoring
@@ -76,7 +80,7 @@ def lambda_handler(event, context):
         result["recommendations"].append(entry)
         
     return {
-        "statusCode": 200, 
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps(result)
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json; charset=utf-8"},
+        "body": json.dumps(result, ensure_ascii=False)
     }
