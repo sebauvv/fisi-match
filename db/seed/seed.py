@@ -24,6 +24,10 @@ load_dotenv()
 
 def get_connection():
     """Establece conexion a PostgreSQL segun variables de entorno."""
+    db_url = os.getenv("DATABASE_URL")
+    if db_url:
+        return psycopg2.connect(db_url)
+    
     return psycopg2.connect(
         host=os.getenv("DB_HOST", "localhost"),
         port=int(os.getenv("DB_PORT", "5433")),
