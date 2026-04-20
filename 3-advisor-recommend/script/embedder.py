@@ -8,12 +8,15 @@ coherencia en el espacio semantico.
 import json
 import boto3
 from botocore.config import Config as BotoConfig
-from config import AWS_REGION, AWS_PROFILE, EMBEDDING_MODEL, EMBEDDING_DIMENSIONS
+from config import AWS_REGION, AWS_PROFILE, EMBEDDING_MODEL, EMBEDDING_DIMENSIONS, MODE
 
 
 def _get_bedrock_client():
     """Crea cliente de Bedrock Runtime con el perfil SSO configurado."""
-    session = boto3.Session(profile_name=AWS_PROFILE, region_name=AWS_REGION)
+    if MODE == "cloud":
+        session = boto3.Session(region_name=AWS_REGION)
+    else:
+        session = boto3.Session(profile_name=AWS_PROFILE, region_name=AWS_REGION)
     return session.client(
         "bedrock-runtime",
         config=BotoConfig(retries={"max_attempts": 3, "mode": "adaptive"}),

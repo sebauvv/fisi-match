@@ -7,11 +7,16 @@ y obtiene metadata de asesores.
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from config import DB_CONFIG
+from config import DB_CONFIG, MODE
 
+
+import os
 
 def get_connection():
     """Abre conexion a PostgreSQL con la configuracion actual."""
+    db_url = os.getenv("DATABASE_URL")
+    if MODE == 'cloud':
+        return psycopg2.connect(db_url)
     return psycopg2.connect(**DB_CONFIG)
 
 

@@ -9,15 +9,23 @@ import json
 import os
 import boto3
 from botocore.config import Config as BotoConfig
-from config import AWS_REGION, AWS_PROFILE, LLM_MODEL
+from config import AWS_REGION, AWS_PROFILE, LLM_MODEL, MODE
 
 
-PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "recommendation.txt")
+if MODE == "cloud":
+    # En AWS Lambda la carpeta prompts se empaca en la base /var/task/prompts
+    PROMPT_PATH = os.path.join(os.path.dirname(__file__), "prompts", "recommendation.txt")
+else:
+    # En local, está un nivel arriba de /script
+    PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "recommendation.txt")
 
 
 def _get_bedrock_client():
     """Crea cliente de Bedrock Runtime."""
-    session = boto3.Session(profile_name=AWS_PROFILE, region_name=AWS_REGION)
+    if MODE == "cloud":
+        session = boto3.Session(region_name=AWS_REGION)
+    else:
+        session = boto3.Session(profile_name=AWS_PROFILE, region_name=AWS_REGION)
     return session.client(
         "bedrock-runtime",
         config=BotoConfig(retries={"max_attempts": 3, "mode": "adaptive"}),
