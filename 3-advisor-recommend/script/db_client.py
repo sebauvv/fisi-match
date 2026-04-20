@@ -53,8 +53,19 @@ def search_similar_chunks(conn, query_embedding, limit=50):
     """
 
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        # Se aumenta ef_search para garantizar recall consistente en HNSW
+        # El valor por defecto de 40 hizo que los chunks cerca del borde de
+        # knn_limit varien entre ejecuciones xd (comparando lo que de local con Lambda).
+        # Con 2311 vectores, ef_search=200 sigue siendo sub-milisegundo
+        cur.execute("SET LOCAL hnsw.ef_search = 200;")
         cur.execute(query, (embedding_str, embedding_str, limit))
-        return cur.fetchall()
+        rows = cur.fetchall()
+        # Para limpiar strings. Por si la db o psycopg devuelve valores con
+        # espacios al final si los datos fueron insertados con padding
+        return [
+            {k: (v.strip() if isinstance(v, str) else v) for k, v in row.items()}
+            for row in rows
+        ]
 
 
 def get_advisor_info(conn, advisor_id):
