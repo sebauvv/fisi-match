@@ -1,0 +1,14 @@
+{
+  "name": "cybertesis-scraper",
+  "version": "1.0.0",
+  "description": "Scraper para dataset de asesores - Cybertesis UNMSM (Fase 1 - Software Inteligente)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:test": "node src/index.js --limit 3"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}

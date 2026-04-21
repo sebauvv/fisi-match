@@ -1,0 +1,17 @@
+{
+  "name": "cybertesis-embeddings",
+  "version": "1.0.0",
+  "description": "Fase 2 - Generacion de embeddings multi-vector con AWS Bedrock Titan v2",
+  "main": "generate.js",
+  "scripts": {
+    "generate": "node generate.js",
+    "generate:test": "node generate.js --limit 2",
+    "generate:dry": "node generate.js --dry-run",
+    "upload": "node upload-s3.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.600.0",
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/credential-providers": "^3.600.0"
+  }
+}
