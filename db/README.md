@@ -19,11 +19,23 @@ cd seed
 pip install -r requirements.txt
 cp .env.example .env
 
-# seed la DB desde los JSONs de Fase 1 y 2
+# Primer seed a la DB (advisors de fase 1 y embeddings de fase 2)
 python seed.py
 
-# para limpiar y re-poblar
+# (opcional) Por si se necesita volver a hacer seed desde 0
 python seed.py --clear
+
+# Si se quiere volver a aplicar el schema
+docker compose exec -T postgres psql -U advisor_user -d advisors_db < schema.sql
+
+# Segundo seed a la DB (jsons faltantes de la fase 1 para consumo de la API)
+python seed_catalog.py --dry-run # para verificar conteos antes de seed
+
+python seed_catalog.py
+
+# (lo mismo si se quiere desde 0)
+python seed_catalog.py --clear
+
 ```
 
 La DB queda accesible en `localhost:5433` con usuario `advisor_user`.
@@ -51,5 +63,11 @@ Dos tablas definidas en `schema.sql`:
 
 - **advisors**: metadata relacional (id, nombre, ORCID, areas)
 - **knowledge_vectors**: vectores 1024d con indice HNSW para kNN coseno
+- **research_areas**: areas unicas de cada asesor en lo que trabajaron
+- **thesis_subjects**: materias unicas de cada tesis
+- **publication_types**: tipos de publicacion
+- **theses**: tesis de Cybertesis
+- **external_publications**: publicaciones de ORCID/Scopus
+
 
 El indice HNSW (`m=16, ef_construction=64`) acelera la busqueda de similitud sobre los 2311 vectores.

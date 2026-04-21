@@ -1,5 +1,6 @@
 -- Schema pgvector: Representacion Semantica de Asesores
 -- PostgreSQL 16 + pgvector
+-- Tablas de catalogos y datos fuente agregadas en fase de UI/API
 
 CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -41,3 +42,78 @@ CREATE INDEX IF NOT EXISTS idx_kv_type_year ON knowledge_vectors(content_type, y
 CREATE INDEX IF NOT EXISTS idx_kv_embedding ON knowledge_vectors
   USING hnsw (embedding vector_cosine_ops)
   WITH (m = 16, ef_construction = 64);
+
+-- Campo adicional en advisors para conteo de publicaciones externas
+ALTER TABLE advisors
+  ADD COLUMN IF NOT EXISTS external_publications_count INT DEFAULT 0;
+
+-- Areas de investigacion de asesores
+CREATE TABLE IF NOT EXISTS research_areas (
+  id           SERIAL PRIMARY KEY,
+  name         TEXT NOT NULL UNIQUE,
+  advisor_count INT DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_ra_name ON research_areas(name);
+
+-- Temas de tesis
+CREATE TABLE IF NOT EXISTS thesis_subjects (
+  id          SERIAL PRIMARY KEY,
+  name        TEXT NOT NULL UNIQUE,
+  thesis_count INT DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_ts_name ON thesis_subjects(name);
+
+-- Catalogo del tipo de publicacion externa de un asesor con etiqueta en español
+CREATE TABLE IF NOT EXISTS publication_types (
+  code      TEXT PRIMARY KEY,
+  label_es  TEXT NOT NULL,
+  pub_count INT DEFAULT 0
+);
+
+-- Registro de las tesis scrapeadas de Cybertesis
+CREATE TABLE IF NOT EXISTS theses (
+  id                TEXT PRIMARY KEY,
+  title             TEXT NOT NULL,
+  abstract          TEXT,
+  author            TEXT,
+  date_issued       TEXT,
+  year              INT,
+  subjects          TEXT[],
+  subject_ocde      TEXT[],
+  thesis_type       TEXT,
+  degree_level      TEXT,
+  degree_name       TEXT,
+  degree_discipline TEXT,
+  degree_grantor    TEXT,
+  citation          TEXT,
+  handle_url        TEXT,
+  language          TEXT,
+  jurors            TEXT[],
+  advisor_id        TEXT REFERENCES advisors(id) ON DELETE SET NULL,
+  advisor_name      TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_theses_advisor_id ON theses(advisor_id);
+CREATE INDEX IF NOT EXISTS idx_theses_year ON theses(year);
+
+-- Publicaciones externas de asesores obtenidas desde ORCID/Scopus
+CREATE TABLE IF NOT EXISTS external_publications (
+  id           SERIAL PRIMARY KEY,
+  advisor_id   TEXT REFERENCES advisors(id) ON DELETE SET NULL,
+  advisor_name TEXT,
+  orcid        TEXT,
+  title        TEXT NOT NULL,
+  type         TEXT REFERENCES publication_types(code),
+  year         INT,
+  journal      TEXT,
+  doi          TEXT,
+  external_url TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_ep_advisor_id ON external_publications(advisor_id);
+CREATE INDEX IF NOT EXISTS idx_ep_type ON external_publications(type);
+CREATE INDEX IF NOT EXISTS idx_ep_year ON external_publications(year);
+
+-- para actualizar external_publications_count en advisors luego del seed:
+-- UPDATE advisors a
+--   SET external_publications_count = (
+--     SELECT COUNT(*) FROM external_publications ep WHERE ep.advisor_id = a.id
+--   );
