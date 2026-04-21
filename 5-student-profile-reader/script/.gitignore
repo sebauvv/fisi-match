@@ -29,3 +29,6 @@ htmlcov/
 # IDE settings (optional)
 .vscode/
 .idea/
+
+/output
+/examples
