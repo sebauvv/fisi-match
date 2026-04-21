@@ -1,120 +1,101 @@
 # Student Profile Reader (Fase 5)
 
-Procesamiento de PDFs academicos de la UNMSM para generar un perfil JSON estructurado del estudiante. Soporta historial academico y reporte de matricula como fuentes de datos.
+Procesamiento de PDFs academicos de la UNMSM para generar un perfil JSON estructurado del estudiante. Soporta historial academico y reporte de matricula (pdfplumber) y CV (Bedrock Nova Lite).
 
 ## Estructura
 
 ```
-script/
-  main.py                        Punto de entrada local (CLI)
-  parsers/
-    historial_parser.py          Extrae datos del historial academico
-    matricula_parser.py          Extrae datos del reporte de matricula
-    cv_parser.py                 Placeholder para procesamiento de CV con LLM
-  examples/                      PDFs de ejemplo
-  output/                        Salida JSON (generada automaticamente)
-  requirements.txt
+5-student-profile-reader/
+  script/
+    main.py                        Punto de entrada local (CLI)
+    lambda_function.py             Handler AWS Lambda
+    parsers/
+      historial_parser.py          Extrae datos del historial academico
+      matricula_parser.py          Extrae datos del reporte de matricula
+      cv_parser.py                 Extrae habilidades/experiencia del CV con LLM
+    examples/                      PDFs de ejemplo
+    output/                        Salida JSON (generada automaticamente)
+    requirements.txt
+  terraform/
+    main.tf                        Lambda, IAM, S3, IAM user
+    variables.tf
+    build.sh                       Empaqueta lambda.zip
+  prompts/
+    prompt.txt                     Prompt para extraccion de CV
 ```
 
-## Configuracion
+## Uso local (CLI)
 
 ```bash
 cd 5-student-profile-reader/script
 source .venv/bin/activate
 pip install -r requirements.txt
-```
 
-## Uso
-
-El script soporta dos modos de procesamiento:
-
-### Modo tabla (pdfplumber) - historial y matricula
-
-```bash
 # Solo historial academico (salida por terminal)
 python main.py --mode tabla --historial examples/historial-academico.pdf
 
-# Historial + reporte de matricula (salida por terminal)
-python main.py --mode tabla --historial examples/historial-academico.pdf --matricula examples/reporte_matricula.pdf
-
-# Guarda como archivo JSON en /output
+# Historial + reporte de matricula (guarda en /output)
 python main.py --mode tabla --historial examples/historial-academico.pdf --matricula examples/reporte_matricula.pdf --output
 ```
 
-### Modo LLM (Bedrock) - CV (pendiente)
+## Despliegue Lambda
 
 ```bash
-python main.py --mode llm --cv examples/SebastianCastillo_CV.pdf
+# 1. Login SSO
+aws sso login --profile "*"
+
+# 2. Build + Terraform
+cd 5-student-profile-reader/terraform
+bash build.sh          # genera lambda.zip + terraform plan
+terraform apply        # despliega
+
+# 3. Credenciales del S3 user para pasarlas a un .env
+terraform output s3_user_access_key_id
+terraform output -raw s3_user_secret_access_key
+
+# 4. Se ponen estas en backend/.env
+# S3_ACCESS_KEY_ID=<access_key>
+# S3_SECRET_ACCESS_KEY=<secret_key>
+# S3_BUCKET=student-profile-pdfs-unmsm
+# LAMBDA_FUNCTION=StudentProfileReader
+# AWS_REGION=us-east-2
+# AWS_PROFILE=" "
 ```
 
-Este modo sera implementado en la fase de integracion con AWS Lambda/Bedrock.
+## API de prueba (FastAPI)
 
-## Argumentos
+```bash
+cd backend
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn test:app --reload --port 8000
+```
 
-| Argumento | Descripcion |
-|---|---|
-| `--mode tabla` | Procesa PDFs tabulares con pdfplumber |
-| `--mode llm` | Procesa CV con LLM (pendiente) |
-| `--historial <pdf>` | Ruta al PDF de historial academico |
-| `--matricula <pdf>` | (Opcional) Ruta al reporte de matricula del periodo vigente |
-| `--cv <pdf>` | Ruta al PDF del CV |
-| `--output` | Guarda el resultado en `/output` en vez de imprimir por terminal |
+```bash
+# test rapido con curl de un POST con historial + matricula + cv
+curl -X POST http://localhost:8000/process-profile \
+  -F "historial=@../5-student-profile-reader/script/examples/historial-academico.pdf" \
+  -F "matricula=@../5-student-profile-reader/script/examples/reporte_matricula.pdf" \
+  -F "cv=@../5-student-profile-reader/script/examples/SebastianCastillo_CV.pdf"
+```
 
 ## Procesamiento
 
-### Historial academico
+### Historial academico (pdfplumber)
 
-Del PDF se extraen:
+Extrae datos del estudiante, cursos por periodo con calificaciones, y resumen de creditos aprobados.
 
-1. **Datos del estudiante**: codigo de matricula, nombres, facultad, escuela, plan de estudios.
-2. **Periodos academicos**: por cada semestre se extrae la lista de cursos con ciclo, plan, tipo, codigo, asignatura, calificacion, creditos y seccion.
-3. **Resumen de creditos aprobados**: creditaje requerido, aprobado, faltante, promedio ponderado y desglose por tipo.
+### Reporte de matricula (pdfplumber, opcional)
 
-### Reporte de matricula (opcional)
+Agrega cursos del periodo vigente con `calificacion: "En progreso"`.
 
-Si se proporciona, los cursos del periodo vigente se agregan al perfil con `calificacion: "En progreso"` y `plan: "-"`, `tipo: "-"`. Esto complementa el historial con los cursos que se estan cursando actualmente.
+### CV (Bedrock Nova Lite, opcional)
 
-El reporte de matricula es opcional. Un estudiante egresado o sin matricula actual no lo tendria.
-
-## Formato de salida
-
-```json
-{
-  "estudiante": {
-    "codigo_matricula": "22200247",
-    "nombres_apellidos": "CASTILLO LAYME SEBASTIAN FERNANDO",
-    "facultad": "20 - INGENIERIA DE SISTEMAS E INFORMATICA",
-    "escuela": "2 - E.P. De Ingenieria De Software",
-    "plan": "2018 - Plan De Estudios 2018"
-  },
-  "periodos_academicos": [
-    {
-      "periodo": "2022-1",
-      "cursos": [
-        {
-          "ciclo": "1",
-          "plan": "2018",
-          "tipo": "O",
-          "codigo": "INO104",
-          "asignatura": "CALCULO I",
-          "calificacion": "15",
-          "creditos": "4.0",
-          "seccion": "1"
-        }
-      ]
-    }
-  ],
-  "resumen_creditos": {
-    "creditaje_requerido_para_egresar": 226.0,
-    "creditaje_aprobado": 194.0,
-    "creditaje_faltante": 32.0,
-    "promedio_ponderado": 15.701
-  }
-}
-```
+Extrae habilidades tecnicas, experiencia laboral y proyectos del estudiante usando un LLM. El prompt esta en `prompts/prompt.txt`.
 
 ## Consideraciones tecnicas
 
-- La libreria `pdfplumber` es puro Python y no requiere binarios del sistema, lo que la hace compatible con AWS Lambda.
-- Los parsers estan separados de `main.py` para que puedan ser importados directamente desde un futuro `lambda_handler.py`.
-- Las tablas que cruzan paginas en el PDF se manejan correctamente: tablas sin fila de encabezado se reconocen como continuacion del periodo anterior.
+- `pdfplumber` es puro Python, compatible con Lambda sin binarios del sistema.
+- Los parsers son modulos independientes importables desde `main.py` (local) y `lambda_function.py` (cloud).
+- Las tablas que cruzan paginas se manejan detectando la presencia/ausencia de la fila de encabezado.
+- La Lambda descarga los PDFs de S3, los procesa, y retorna JSON con URLs publicas de los PDFs almacenados.
