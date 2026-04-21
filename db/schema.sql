@@ -117,3 +117,74 @@ CREATE INDEX IF NOT EXISTS idx_ep_year ON external_publications(year);
 --   SET external_publications_count = (
 --     SELECT COUNT(*) FROM external_publications ep WHERE ep.advisor_id = a.id
 --   );
+
+
+-- Tabla de estudiantes para el sistema de recomendación de asesores
+-- Almacena perfil académico y datos de autenticación
+
+CREATE TABLE IF NOT EXISTS students (
+  -- Identidad y autenticación
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email                 TEXT NOT NULL UNIQUE,
+  password_hash         TEXT NOT NULL,
+
+  -- Datos del estudiante (de historial.estudiante)
+  codigo_matricula      TEXT NOT NULL UNIQUE,
+  nombres_apellidos     TEXT NOT NULL,
+  facultad              TEXT,
+  escuela               TEXT,
+  plan                  TEXT,
+
+  -- URLs de PDFs del estudiante
+  pdf_url_historial     TEXT,
+  pdf_url_matricula     TEXT,
+  pdf_url_cv            TEXT,
+
+  -- Historial académico serializado (estructura variable por estudiante)
+  periodos_academicos   JSONB NOT NULL DEFAULT '[]',
+
+  -- CV en texto plano extraído por LLM
+  cv_text               TEXT,
+
+  -- Resumen de créditos (de historial.resumen_creditos)
+  creditaje_requerido_para_egresar  INT,
+  creditaje_aprobado                INT,
+  obligatorios                      INT,
+  de_especialidad                   INT,
+  electivos_generales               INT,
+  electivos_de_especialidad         INT,
+  optativos                         INT,
+  alternativos                      INT,
+  de_otra_especialidad              INT,
+  mas_de_una_vez                    INT,
+  otros                             INT,
+  creditaje_faltante                INT,
+  promedio_ponderado                NUMERIC(5, 3),
+
+  -- Timestamps
+  created_at            TIMESTAMPTZ DEFAULT now(),
+  updated_at            TIMESTAMPTZ DEFAULT now()
+);
+
+-- Índices relacionales
+CREATE INDEX IF NOT EXISTS idx_students_codigo_matricula ON students(codigo_matricula);
+CREATE INDEX IF NOT EXISTS idx_students_email ON students(email);
+CREATE INDEX IF NOT EXISTS idx_students_promedio ON students(promedio_ponderado);
+
+-- Índice GIN para búsquedas dentro del JSONB de periodos_academicos
+-- Permite queries como: periodos_academicos @> '[{"periodo": "2025-1"}]'
+CREATE INDEX IF NOT EXISTS idx_students_periodos ON students USING gin(periodos_academicos);
+
+-- Trigger para mantener updated_at automáticamente
+CREATE OR REPLACE FUNCTION update_students_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_students_updated_at
+  BEFORE UPDATE ON students
+  FOR EACH ROW
+  EXECUTE FUNCTION update_students_updated_at();
