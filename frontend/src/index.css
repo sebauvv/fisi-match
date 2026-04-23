@@ -1,1 +1,80 @@
 @import "tailwindcss";
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); */
+
+/* TailwindCSS v4: class-based dark mode (responds to html.dark) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+	/* Light palette */
+	--color-bg-primary: #F5F2EC;
+	--color-bg-surface: #FFFFFF;
+	--color-bg-surface-alt: #EDE9E1;
+	--color-bg-hover: #E8E4DC;
+	--color-text-primary: #1E1E2E;
+	--color-text-secondary: #5C5C6E;
+	--color-text-muted: #8E8E9E;
+	--color-border: #D9D5CD;
+	--color-border-focus: #7C6F5B;
+	--color-accent: #4F6D7A;
+	--color-accent-hover: #3D5A66;
+	--color-accent-soft: #E6EEF1;
+	--color-success: #3D8B5E;
+	--color-error: #C44545;
+	--color-warning: #C4893D;
+
+	/* Dark palette */
+	--color-dark-bg-primary: #0F1729;
+	--color-dark-bg-surface: #1A2640;
+	--color-dark-bg-surface-alt: #1F2D47;
+	--color-dark-bg-hover: #253654;
+	--color-dark-text-primary: #E2E8F0;
+	--color-dark-text-secondary: #94A3B8;
+	--color-dark-text-muted: #64748B;
+	--color-dark-border: #2D3F5E;
+	--color-dark-border-focus: #5B8DEF;
+	--color-dark-accent: #5B8DEF;
+	--color-dark-accent-hover: #4A7CE0;
+	--color-dark-accent-soft: #1A2D4D;
+	--color-dark-success: #4ADE80;
+	--color-dark-error: #F87171;
+	--color-dark-warning: #FBBF24;
+}
+
+/* Base resets */
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: var(--font-sans);
+	background-color: var(--color-bg-primary);
+	color: var(--color-text-primary);
+	transition: background-color 0.3s ease, color 0.3s ease;
+	min-height: 100vh;
+}
+
+/* Dark mode overrides */
+html.dark body {
+	background-color: var(--color-dark-bg-primary);
+	color: var(--color-dark-text-primary);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+	width: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--color-border);
+	border-radius: 3px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+	background: var(--color-dark-border);
+}

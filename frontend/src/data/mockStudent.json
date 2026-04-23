@@ -1,0 +1,47 @@
+{
+  "student_id": "mock-001",
+  "email": "sebastian@unmsm.edu.pe",
+  "estudiante": {
+    "codigo_matricula": "22200247",
+    "nombres_apellidos": "CASTILLO LAYME SEBASTIAN FERNANDO",
+    "facultad": "20 - INGENIERIA DE SISTEMAS E INFORMATICA",
+    "escuela": "2 - E.P. De Ingenieria De Software",
+    "plan": "2018 - Plan De Estudios 2018"
+  },
+  "periodos_academicos": [
+    {
+      "periodo": "2022-1",
+      "cursos": [
+        { "ciclo": "1", "plan": "2018", "tipo": "E", "codigo": "INE002", "asignatura": "PROGRAMACION Y COMPUTACION", "calificacion": "16", "creditos": "2.0", "seccion": "4" },
+        { "ciclo": "1", "plan": "2018", "tipo": "O", "codigo": "INO101", "asignatura": "REDACCION Y TECNICAS DE COMUNICACION EFECTIVA I", "calificacion": "17", "creditos": "3.0", "seccion": "2" }
+      ]
+    },
+    {
+      "periodo": "2022-2",
+      "cursos": [
+        { "ciclo": "2", "plan": "2018", "tipo": "O", "codigo": "INO201", "asignatura": "REDACCION Y TECNICAS DE COMUNICACION EFECTIVA II", "calificacion": "16", "creditos": "3.0", "seccion": "2" }
+      ]
+    }
+  ],
+  "resumen_creditos": {
+    "creditaje_requerido_para_egresar": 226.0,
+    "creditaje_aprobado": 194.0,
+    "obligatorios": 190.0,
+    "de_especialidad": 0.0,
+    "electivos_generales": 4.0,
+    "electivos_de_especialidad": 0.0,
+    "optativos": 0.0,
+    "alternativos": 0.0,
+    "de_otra_especialidad": 0.0,
+    "mas_de_una_vez": 0.0,
+    "otros": 0.0,
+    "creditaje_faltante": 32.0,
+    "promedio_ponderado": 15.701
+  },
+  "cv_text": "Habilidades Tecnicas:\n- Lenguajes: Python, TypeScript, Java, C++\n- Frameworks: React, FastAPI, Spring Boot\n- Bases de datos: PostgreSQL, MongoDB\n- Cloud: AWS (Lambda, S3, EC2)\n- Herramientas: Git, Docker, Terraform\n\nExperiencia Laboral:\n- Practicante de Desarrollo en Empresa X (2025-1 a 2025-2): Desarrollo de microservicios con FastAPI y despliegue en AWS Lambda. Mantenimiento de bases de datos PostgreSQL.\n\nProyectos Personales:\n- Sistema de Recomendacion de Asesores: Plataforma con RAG y pgvector para recomendar asesores de tesis basado en similitud semantica.\n- Portfolio Personal: Sitio web minimalista con React, desplegado en S3 + CloudFront con CI/CD en GitHub Actions.",
+  "pdf_urls": {
+    "historial": "https://student-profile-pdfs-unmsm.s3.us-east-2.amazonaws.com/uploads/mock/historial.pdf",
+    "matricula": "https://student-profile-pdfs-unmsm.s3.us-east-2.amazonaws.com/uploads/mock/matricula.pdf",
+    "cv": "https://student-profile-pdfs-unmsm.s3.us-east-2.amazonaws.com/uploads/mock/cv.pdf"
+  }
+}
