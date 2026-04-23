@@ -27,12 +27,21 @@ def get_s3_client():
 
 
 def get_lambda_client():
-    """Crea cliente Lambda usando el profile SSO."""
-    session = boto3.Session(
-        profile_name=settings.aws_profile,
-        region_name=settings.aws_region,
-    )
-    return session.client("lambda")
+    """
+    Crea cliente Lambda usando credenciales IAM del .env.
+    No usa perfil SSO — funciona tanto en local como en produccion.
+    Si no hay access key configurada, boto3 usa la cadena de credenciales
+    por defecto (variables de entorno, IAM instance role, etc.).
+    """
+    if settings.s3_access_key_id and settings.s3_secret_access_key:
+        return boto3.client(
+            "lambda",
+            region_name=settings.aws_region,
+            aws_access_key_id=settings.s3_access_key_id,
+            aws_secret_access_key=settings.s3_secret_access_key,
+        )
+    return boto3.client("lambda", region_name=settings.aws_region)
+
 
 
 async def upload_to_s3(s3_client, file: UploadFile, prefix: str) -> str:
