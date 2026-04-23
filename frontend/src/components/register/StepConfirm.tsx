@@ -15,7 +15,7 @@ export default function StepConfirm({ profile, onConfirm }: StepConfirmProps) {
   const [editPersonal, setEditPersonal] = useState(false);
   const [editCV, setEditCV] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { user, token } = useAuth();
+  const { user, token, updateUser } = useAuth();
 
   const est = profile.historial.estudiante;
   const resumen = profile.historial.resumen_creditos;
@@ -164,13 +164,24 @@ export default function StepConfirm({ profile, onConfirm }: StepConfirmProps) {
           if (token && user?.student_id) {
             setSaving(true);
             try {
-              await updateStudent(user.student_id, token, {
+              const updated = await updateStudent(user.student_id, token, {
                 nombres_apellidos: nombre,
                 codigo_matricula: codigo,
                 facultad,
                 escuela,
                 plan,
                 cv_text: editableCvText,
+              });
+              // Sincroniza AuthContext y localStorage con la respuesta real de la API
+              updateUser({
+                estudiante: {
+                  nombres_apellidos: updated.nombres_apellidos ?? nombre,
+                  codigo_matricula: updated.codigo_matricula ?? codigo,
+                  facultad: updated.facultad ?? facultad,
+                  escuela: updated.escuela ?? escuela,
+                  plan: updated.plan ?? plan,
+                },
+                cv_text: updated.cv_text ?? editableCvText,
               });
             } catch {
               // Fallo silencioso: continua de todos modos

@@ -18,7 +18,7 @@ export default function StepCredentials({ email, password, onUpdate, onNext }: S
 			newErrors.email = 'Solo se aceptan correos @unmsm.edu.pe';
 		}
 		if (password.length < 6) {
-			newErrors.password = 'La contrasena debe tener al menos 6 caracteres';
+			newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
 		}
 		setErrors(newErrors);
 		return !newErrors.email && !newErrors.password;
@@ -59,7 +59,7 @@ export default function StepCredentials({ email, password, onUpdate, onNext }: S
 			{/* Password */}
 			<div>
 				<label className="mb-1.5 block text-sm font-medium text-text-primary dark:text-dark-text-primary">
-					Contrasena
+					Contraseña
 				</label>
 				<div className="relative">
 					<Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted dark:text-dark-text-muted" />
