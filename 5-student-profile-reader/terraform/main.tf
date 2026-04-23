@@ -120,13 +120,21 @@ resource "aws_iam_user_policy" "s3_uploader_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid      = "S3Access"
         Action   = ["s3:PutObject", "s3:PutObjectAcl", "s3:GetObject"]
         Effect   = "Allow"
         Resource = "${aws_s3_bucket.pdf_bucket.arn}/*"
+      },
+      {
+        Sid      = "LambdaInvoke"
+        Action   = ["lambda:InvokeFunction"]
+        Effect   = "Allow"
+        Resource = aws_lambda_function.student_profile_reader.arn
       }
     ]
   })
 }
+
 
 resource "aws_iam_access_key" "s3_uploader_key" {
   user = aws_iam_user.s3_uploader.name
