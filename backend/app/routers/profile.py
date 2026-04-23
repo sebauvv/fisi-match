@@ -61,6 +61,8 @@ def _insert_student(body: dict, email: str, password: str) -> str:
         promedio_ponderado=resumen.get("promedio_ponderado"),
     )
 
+    student_id = str(student.id)  # capturado antes de abrir la sesion — es un UUID de Python puro
+
     with Session(engine) as session:
         # Verifica duplicado de email antes de insertar
         existing = session.exec(
@@ -74,6 +76,7 @@ def _insert_student(body: dict, email: str, password: str) -> str:
         try:
             session.add(student)
             session.commit()
+            # student_id ya esta capturado arriba como str — no acceder a student.id aqui
         except IntegrityError as exc:
             session.rollback()
             raise HTTPException(
@@ -81,7 +84,7 @@ def _insert_student(body: dict, email: str, password: str) -> str:
                 detail=f"Registro duplicado: {exc.orig}",
             ) from exc
 
-    return str(student.id)
+    return student_id
 
 
 def _int(value) -> int | None:

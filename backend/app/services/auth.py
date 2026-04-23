@@ -1,28 +1,31 @@
-"""Servicio de autenticacion: hashing de contraseñas y JWT."""
+"""Servicio de autenticacion: hashing de contraseñas y JWT.
+
+Usa bcrypt directamente (sin passlib) para evitar conflictos de version
+con bcrypt >= 4.x donde passlib 1.7.4 busca bcrypt.__about__ que no existe.
+"""
 
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.config import get_settings
 
 settings = get_settings()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme = HTTPBearer()
 
 
 def hash_password(plain: str) -> str:
-    return pwd_context.hash(plain)
+    return bcrypt.hashpw(plain.encode(), bcrypt.gensalt()).decode()
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    return bcrypt.checkpw(plain.encode(), hashed.encode())
 
 
 def create_access_token(
