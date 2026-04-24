@@ -47,6 +47,9 @@ class Student(SQLModel, table=True):
     # CV en texto plano extraido por LLM
     cv_text: Optional[str] = None
 
+    # Idea de Tesis inicial
+    thesis_idea: Optional[str] = Field(default="")
+
     # Resumen de creditos
     creditaje_requerido_para_egresar: Optional[int] = None
     creditaje_aprobado: Optional[int] = None

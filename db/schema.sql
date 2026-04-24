@@ -188,3 +188,6 @@ CREATE TRIGGER trg_students_updated_at
   BEFORE UPDATE ON students
   FOR EACH ROW
   EXECUTE FUNCTION update_students_updated_at();
+
+ALTER TABLE students
+  ADD COLUMN IF NOT EXISTS thesis_idea TEXT DEFAULT '';

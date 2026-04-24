@@ -28,6 +28,7 @@ class StudentUpdate(BaseModel):
     escuela: Optional[str] = None
     plan: Optional[str] = None
     cv_text: Optional[str] = None
+    thesis_idea: Optional[str] = None
 
 
 class CreditsSummaryRead(BaseModel):
@@ -59,6 +60,7 @@ class StudentRead(BaseModel):
     pdf_url_cv: Optional[str] = None
     periodos_academicos: Optional[Any] = None
     cv_text: Optional[str] = None
+    thesis_idea: str
     resumen_creditos: CreditsSummaryRead
 
     @classmethod
@@ -76,6 +78,7 @@ class StudentRead(BaseModel):
             pdf_url_cv=s.pdf_url_cv,
             periodos_academicos=s.periodos_academicos,
             cv_text=s.cv_text,
+            thesis_idea=s.thesis_idea or "",
             resumen_creditos=CreditsSummaryRead(
                 creditaje_requerido_para_egresar=s.creditaje_requerido_para_egresar,
                 creditaje_aprobado=s.creditaje_aprobado,
