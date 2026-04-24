@@ -6,9 +6,10 @@ import { useAuth } from '../../context/AuthContext';
 
 interface HeaderProps {
 	onToggleSidebar: () => void;
+	onOpenThesisModal?: () => void;
 }
 
-export default function Header({ onToggleSidebar }: HeaderProps) {
+export default function Header({ onToggleSidebar, onOpenThesisModal }: HeaderProps) {
 	const { isDark, toggleTheme } = useTheme();
 	const { logout } = useAuth();
 	const navigate = useNavigate();
@@ -44,10 +45,21 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
 					</svg>
 				</button>
-				<span className="text-lg font-bold tracking-tight text-text-primary dark:text-dark-text-primary" onClick={() => navigate('/home')}>
+				<span className="text-lg font-bold tracking-tight text-text-primary dark:text-dark-text-primary cursor-pointer" onClick={() => navigate('/home')}>
 					FISI Match
 				</span>
 			</div>
+
+			{/* Warning Banner Contextualized */}
+			{!useAuth().user?.thesis_idea && (
+				<button 
+					onClick={onOpenThesisModal} 
+					className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium hover:bg-yellow-500/20 border border-yellow-500/20 transition-colors whitespace-nowrap"
+				>
+					<span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse hidden sm:block"></span>
+					Insertar idea de tesis
+				</button>
+			)}
 
 			{/* Right: theme toggle + profile */}
 			<div className="flex items-center gap-2">
