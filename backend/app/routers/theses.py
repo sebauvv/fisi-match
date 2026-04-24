@@ -38,6 +38,7 @@ def list_theses(
             advisor_name=t.advisor_name,
             advisor_id=t.advisor_id,
             degree_level=t.degree_level,
+            degree_name=t.degree_name,
         )
         for t in theses
     ]
