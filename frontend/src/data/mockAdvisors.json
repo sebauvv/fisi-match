@@ -1,0 +1,335 @@
+[
+  {
+    "id": "972f13a7b2b04e9270cb2140f19ddc17",
+    "full_name": "Aguilar Linares, Ciro",
+    "research_areas": [
+      "Desarrollo de software ágil",
+      "Software",
+      "Scrum (Desarrollo de software para computadora)"
+    ],
+    "thesis_count": 1,
+    "external_publications_count": 0,
+    "orcid": "https://orcid.org/0000-0002-2143-9851"
+  },
+  {
+    "id": "c5df3c92cdfe3c74c29040ee4703e7de",
+    "full_name": "Carrasco Oré, Nilo Eloy",
+    "research_areas": [
+      "Administración de proyectos",
+      "Microempresas",
+      "Estrategia",
+      "Competencia económica",
+      "Sistemas de almacenamiento y recuperación de la información",
+      "Páginas Web - Diseño",
+      "Comprobantes de pago",
+      "Publicidad",
+      "Marketing digital",
+      "Sistemas de seguridad",
+      "Seguridad informática - Normas",
+      "Tecnología de la información - Medidas de seguridad",
+      "Protección de datos",
+      "ITIL (Estándar en la administración de la tecnología de la información)",
+      "COBIT (Estándar en la administración de la tecnología de la información)",
+      "Control de calidad",
+      "Control de procesos",
+      "Elecciones - Innovaciones tecnológicas - Perú",
+      "Elecciones - Perú - Procesamiento de datos",
+      "Procesamiento electrónico de datos - Administración",
+      "Gestión",
+      "reingeniería",
+      "servidores web",
+      "Redes de área local inalámbricas Redes de computadoras - Control de acceso",
+      "Sistemas de comunicaciones inalámbricos - Medidas de seguridad",
+      "Sistemas de comunicaciones inalámbricos - Normas",
+      "Scrum (Desarrollo de software para computadora)",
+      "Metodología",
+      "Usuarios",
+      "Seguridad industrial",
+      "Herramientas digitales",
+      "Microempresas - Innovaciones tecnológicas - Perú",
+      "Desarrollo de sitios Web",
+      "Enseñanza asistida por computadora - Programas para computadoras",
+      "Atención médica",
+      "Six sigma (Normas de control de calidad)",
+      "Salud ocupacional",
+      "Métodos de simulación"
+    ],
+    "thesis_count": 13,
+    "external_publications_count": 1,
+    "orcid": "https://orcid.org/0000-0001-5664-9309"
+  },
+  {
+    "id": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+    "full_name": "Calderón Vilca, Hugo David",
+    "research_areas": [
+      "Predicciones",
+      "Redes Neuronales (Computación)",
+      "Inteligencia Artificial",
+      "Machine Learning",
+      "Procesamiento de Lenguaje Natural",
+      "Deep Learning",
+      "Visión por computadora",
+      "Análisis de datos",
+      "Big Data",
+      "Minería de datos",
+      "Algoritmos genéticos"
+    ],
+    "thesis_count": 4,
+    "external_publications_count": 30,
+    "orcid": "https://orcid.org/0000-0002-1177-4847"
+  },
+  {
+    "id": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+    "full_name": "Maguiña Pérez, Ricardo Alberto",
+    "research_areas": [
+      "Redes Neuronales (Neurobiología)",
+      "Sistemas expertos (Inteligencia artificial)",
+      "Lógica difusa",
+      "Robótica"
+    ],
+    "thesis_count": 7,
+    "external_publications_count": 12,
+    "orcid": null
+  },
+  {
+    "id": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
+    "full_name": "Ñaupari Quiroz, Ángel",
+    "research_areas": [
+      "Ñoño - Investigación de sistemas",
+      "Sistemas de información",
+      "Bases de datos relacionales",
+      "SQL",
+      "NoSQL"
+    ],
+    "thesis_count": 9,
+    "external_publications_count": 5,
+    "orcid": "https://orcid.org/0000-0003-1234-5678"
+  },
+  {
+    "id": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
+    "full_name": "Flores Masías, Edward Julio",
+    "research_areas": [
+      "Fintech",
+      "Blockchain",
+      "Criptomonedas",
+      "Seguridad financiera",
+      "E-commerce"
+    ],
+    "thesis_count": 3,
+    "external_publications_count": 8,
+    "orcid": "https://orcid.org/0000-0001-9999-1234"
+  },
+  {
+    "id": "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+    "full_name": "García Díaz, Luis Miguel",
+    "research_areas": [
+      "Gestión de proyectos de software",
+      "DevOps",
+      "Integración continua",
+      "Calidad de software",
+      "Pruebas de software",
+      "Arquitectura de software"
+    ],
+    "thesis_count": 11,
+    "external_publications_count": 0,
+    "orcid": null
+  },
+  {
+    "id": "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
+    "full_name": "Herrera Quispe, Jorge Antonio",
+    "research_areas": [
+      "Heurísticas",
+      "Optimización combinatoria",
+      "Algoritmos metaheurísticos",
+      "Investigación operativa"
+    ],
+    "thesis_count": 6,
+    "external_publications_count": 15,
+    "orcid": "https://orcid.org/0000-0002-7777-8888"
+  },
+  {
+    "id": "a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+    "full_name": "Inga Guevara, Paul Antony",
+    "research_areas": [
+      "Internet de las Cosas (IoT)",
+      "Sistemas embebidos",
+      "Redes de sensores",
+      "Automatización industrial",
+      "Robótica educativa"
+    ],
+    "thesis_count": 5,
+    "external_publications_count": 9,
+    "orcid": "https://orcid.org/0000-0003-5555-6666"
+  },
+  {
+    "id": "b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3",
+    "full_name": "Jesús Atencio, Rosa María",
+    "research_areas": [
+      "Justicia digital",
+      "E-government",
+      "Gobernanza de datos",
+      "Políticas de tecnología"
+    ],
+    "thesis_count": 2,
+    "external_publications_count": 3,
+    "orcid": null
+  },
+  {
+    "id": "c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4",
+    "full_name": "Llerena Castro, Víctor Hugo",
+    "research_areas": [
+      "Lenguajes de programación",
+      "Compiladores",
+      "Teoría de autómatas",
+      "Computación teórica"
+    ],
+    "thesis_count": 8,
+    "external_publications_count": 20,
+    "orcid": "https://orcid.org/0000-0001-3333-4444"
+  },
+  {
+    "id": "d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5",
+    "full_name": "Medina Torres, Sandra Patricia",
+    "research_areas": [
+      "Metodologías ágiles",
+      "Scrum (Desarrollo de software para computadora)",
+      "Kanban",
+      "XP (Programación extrema)",
+      "Gestión del conocimiento",
+      "Transformación digital"
+    ],
+    "thesis_count": 14,
+    "external_publications_count": 6,
+    "orcid": "https://orcid.org/0000-0002-8888-9999"
+  },
+  {
+    "id": "e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6",
+    "full_name": "Nolasco Jara, Carlos Enrique",
+    "research_areas": [
+      "Nuevas tecnologías en educación",
+      "E-learning",
+      "Gamificación",
+      "Realidad aumentada en educación"
+    ],
+    "thesis_count": 5,
+    "external_publications_count": 11,
+    "orcid": "https://orcid.org/0000-0003-2222-1111"
+  },
+  {
+    "id": "f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7",
+    "full_name": "Orellana Quispe, Pamela",
+    "research_areas": [
+      "Optimización de redes",
+      "Redes de computadoras",
+      "Protocolos de red",
+      "Ciberseguridad"
+    ],
+    "thesis_count": 3,
+    "external_publications_count": 7,
+    "orcid": null
+  },
+  {
+    "id": "a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8",
+    "full_name": "Pacheco Huanca, Edwin",
+    "research_areas": [
+      "Procesamiento de imágenes médicas",
+      "Diagnóstico asistido por computadora",
+      "Visión por computadora",
+      "Telemedicina"
+    ],
+    "thesis_count": 6,
+    "external_publications_count": 18,
+    "orcid": "https://orcid.org/0000-0001-6666-7777"
+  },
+  {
+    "id": "b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+    "full_name": "Quispe Mamani, Raúl",
+    "research_areas": [
+      "Quantum computing",
+      "Criptografía cuántica",
+      "Algoritmos cuánticos"
+    ],
+    "thesis_count": 1,
+    "external_publications_count": 22,
+    "orcid": "https://orcid.org/0000-0002-4444-3333"
+  },
+  {
+    "id": "c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0",
+    "full_name": "Ríos Valverde, Giuliana",
+    "research_areas": [
+      "Reconocimiento de patrones",
+      "Procesamiento de señales",
+      "Sistemas de control",
+      "Electrónica digital"
+    ],
+    "thesis_count": 4,
+    "external_publications_count": 13,
+    "orcid": "https://orcid.org/0000-0003-9876-5432"
+  },
+  {
+    "id": "d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1",
+    "full_name": "Soto Mendoza, Luis Alberto",
+    "research_areas": [
+      "Seguridad en redes",
+      "Criptografía",
+      "Sistemas de detección de intrusos",
+      "Análisis forense digital",
+      "Hacking ético"
+    ],
+    "thesis_count": 10,
+    "external_publications_count": 4,
+    "orcid": null
+  },
+  {
+    "id": "e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+    "full_name": "Torres Espinoza, Milagros",
+    "research_areas": [
+      "Tecnología de la información - Política gubernamental - Perú",
+      "Transformación digital",
+      "Innovación tecnológica"
+    ],
+    "thesis_count": 7,
+    "external_publications_count": 2,
+    "orcid": "https://orcid.org/0000-0001-1111-2222"
+  },
+  {
+    "id": "f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3",
+    "full_name": "Uceda Sifuentes, Marco",
+    "research_areas": [
+      "UX/UI Design",
+      "Accesibilidad web",
+      "Interacción humano-computadora",
+      "Diseño centrado en el usuario",
+      "Prototipado rápido"
+    ],
+    "thesis_count": 9,
+    "external_publications_count": 16,
+    "orcid": "https://orcid.org/0000-0002-5678-9012"
+  },
+  {
+    "id": "a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4",
+    "full_name": "Vargas Huanca, Betty Marlene",
+    "research_areas": [
+      "Virtualización",
+      "Cloud computing",
+      "Contenedores (Docker, Kubernetes)",
+      "Infraestructura como código"
+    ],
+    "thesis_count": 6,
+    "external_publications_count": 10,
+    "orcid": "https://orcid.org/0000-0003-3456-7890"
+  },
+  {
+    "id": "b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    "full_name": "Zapata Cárdenas, Juan Carlos",
+    "research_areas": [
+      "Zoología computacional",
+      "Bioinformática",
+      "Algoritmos evolutivos",
+      "Modelamiento computacional"
+    ],
+    "thesis_count": 2,
+    "external_publications_count": 25,
+    "orcid": "https://orcid.org/0000-0001-8765-4321"
+  }
+]

@@ -96,7 +96,7 @@ export default function HomePage() {
 				{/* Right: Stats + dashboard */}
 				<div className="space-y-6 lg:col-span-2">
 					{loading || !stats ? (
-						<div className="flex h-full min-h-[300px] items-center justify-center rounded-2xl border border-border bg-bg-surface p-6 dark:border-dark-border dark:bg-dark-bg-surface">
+						<div className="flex h-full min-h-75 items-center justify-center rounded-2xl border border-border bg-bg-surface p-6 dark:border-dark-border dark:bg-dark-bg-surface">
 							<div className="flex flex-col items-center gap-3">
 								<div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-accent border-r-transparent dark:border-dark-accent dark:border-r-transparent"></div>
 								<p className="text-sm text-text-muted dark:text-dark-text-muted">Cargando estadísticas...</p>

@@ -4,6 +4,8 @@ import AppLayout from './components/layout/AppLayout';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import AdvisorExplorerPage from './pages/AdvisorExplorerPage';
+import AdvisorProfilePage from './pages/AdvisorProfilePage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -28,6 +30,8 @@ export default function App() {
           }
         >
           <Route path="/home" element={<HomePage />} />
+          <Route path="/explorador-profesores" element={<AdvisorExplorerPage />} />
+          <Route path="/explorador-profesores/:id" element={<AdvisorProfilePage />} />
         </Route>
 
         {/* Default redirect */}

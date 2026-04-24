@@ -6,15 +6,19 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { label: 'Explorador de Profesores', icon: Search },
-  { label: 'Explorador de Tesis', icon: BookOpen },
-  { label: 'Explorador de Articulos Externos', icon: FileText },
-  { label: 'Recomendacion de Asesor', icon: Compass },
-  { label: 'Reporte de Alineamiento', icon: ClipboardList },
-  { label: 'Recomendacion de Temas Alternativos', icon: Lightbulb },
+  { label: 'Explorador de Profesores', icon: Search, path: '/explorador-profesores' },
+  { label: 'Explorador de Tesis', icon: BookOpen, path: '#' },
+  { label: 'Explorador de Articulos Externos', icon: FileText, path: '#' },
+  { label: 'Recomendacion de Asesor', icon: Compass, path: '#' },
+  { label: 'Reporte de Alineamiento', icon: ClipboardList, path: '#' },
+  { label: 'Recomendacion de Temas Alternativos', icon: Lightbulb, path: '#' },
 ];
 
+import { useNavigate, useLocation } from 'react-router-dom';
+
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   return (
     <>
       {/* Backdrop overlay */}
@@ -46,11 +50,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Navigation items */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-          {NAV_ITEMS.map(({ label, icon: Icon }) => (
+          {NAV_ITEMS.map(({ label, icon: Icon, path }) => (
             <button
               key={label}
-              onClick={onClose}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary dark:text-dark-text-secondary dark:hover:bg-dark-bg-hover dark:hover:text-dark-text-primary"
+              onClick={() => {
+                if (path !== '#') navigate(path);
+                onClose();
+              }}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors ${
+                location.pathname.startsWith(path) && path !== '#'
+                  ? 'bg-bg-hover text-text-primary dark:bg-dark-bg-hover dark:text-dark-text-primary'
+                  : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary dark:text-dark-text-secondary dark:hover:bg-dark-bg-hover dark:hover:text-dark-text-primary'
+              }`}
             >
               <Icon className="h-4.5 w-4.5 shrink-0" />
               {label}
