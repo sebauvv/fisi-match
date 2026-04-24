@@ -8,6 +8,7 @@ class AdvisorListItem(BaseModel):
     id: str
     full_name: str
     research_areas: Optional[list[str]] = None
+    advisor_dni: Optional[str] = None
     thesis_count: int = 0
     external_publications_count: int = 0
     orcid: Optional[str] = None

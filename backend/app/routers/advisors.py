@@ -32,6 +32,7 @@ def list_advisors(
             id=a.id,
             full_name=a.full_name,
             research_areas=a.research_areas,
+						advisor_dni=a.advisor_dni,
             thesis_count=a.thesis_count,
             external_publications_count=a.external_publications_count,
             orcid=a.orcid,
