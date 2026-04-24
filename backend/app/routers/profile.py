@@ -126,7 +126,7 @@ async def process_profile(
         payload["cv_key"] = await upload_to_s3(s3, cv, prefix)
 
     lambda_response = lmb.invoke(
-        FunctionName=settings.lambda_function,
+        FunctionName=settings.pdf_lambda_function,
         InvocationType="RequestResponse",
         Payload=json.dumps(payload),
     )

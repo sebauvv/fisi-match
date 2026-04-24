@@ -10,9 +10,12 @@ class Settings(BaseSettings):
     aws_region: str = os.getenv("AWS_REGION")
     aws_profile: str = os.getenv("AWS_PROFILE")
     s3_bucket: str = os.getenv("S3_BUCKET")
-    lambda_function: str = os.getenv("LAMBDA_FUNCTION")
     s3_access_key_id: str = os.getenv("S3_ACCESS_KEY_ID")
     s3_secret_access_key: str = os.getenv("S3_SECRET_ACCESS_KEY")
+
+    # Lambdas
+    pdf_lambda_function: str = os.getenv("PDF_LAMBDA_FUNCTION")
+    advisor_lambda_function: str = os.getenv("ADVISOR_LAMBDA_FUNCTION")
 
     # PostgreSQL
     db_host: str = os.getenv("DB_HOST")
