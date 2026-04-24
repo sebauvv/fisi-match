@@ -85,3 +85,12 @@ def get_advisor(advisor_id: str, session: Session = Depends(get_session)):
         name_variants=advisor.name_variants,
         advisor_dni=advisor.advisor_dni,
     )
+
+@router.get("/{advisor_id}/oldest-thesis-year")
+def get_oldest_thesis_year(advisor_id: str, session: Session = Depends(get_session)):
+    from app.models.thesis import Thesis
+    min_year = session.exec(
+        select(func.min(Thesis.year)).where(Thesis.advisor_id == advisor_id)
+    ).one_or_none()
+    
+    return {"year": min_year}
