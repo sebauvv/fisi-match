@@ -17,3 +17,9 @@ class AdvisorListItem(BaseModel):
 class AdvisorRead(AdvisorListItem):
     name_variants: Optional[list[str]] = None
     advisor_dni: Optional[str] = None
+
+class AdvisorListPaginated(BaseModel):
+    items: list[AdvisorListItem]
+    total: int
+    limit: int
+    offset: int
