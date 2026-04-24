@@ -24,6 +24,11 @@ const AdvisorExplorerPage: React.FC = () => {
 	// States for 'name' mode
 	const [advisors, setAdvisors] = useState<Advisor[]>([]);
 	const [loadingAdvisors, setLoadingAdvisors] = useState(false);
+	
+	// Pagination States
+	const [limit, setLimit] = useState(10);
+	const [offset, setOffset] = useState(0);
+	const [total, setTotal] = useState(0);
 
 	// States for 'area' mode
 	const [allAreas, setAllAreas] = useState<ResearchArea[]>([]);
@@ -48,13 +53,33 @@ const AdvisorExplorerPage: React.FC = () => {
 			setLoadingAdvisors(true);
 			try {
 				if (mode === 'name') {
-					const results = await advisorApi.searchByName(query, { hasOrcid: orcidFilter });
-					if (active) setAdvisors(results);
+					const response = await advisorApi.getAdvisors({
+						limit,
+						offset,
+						search_name: query,
+						has_orcid: orcidFilter
+					});
+					if (active) {
+						setAdvisors(response.items);
+						setTotal(response.total);
+					}
 				} else if (mode === 'area' && selectedArea) {
-					const results = await advisorApi.getAdvisorsByArea(selectedArea.name, { hasOrcid: orcidFilter });
-					if (active) setAdvisors(results);
+					// Pasa la busqueda por area al nuevo parámetro del list_advisors real
+					const response = await advisorApi.getAdvisors({
+						limit,
+						offset,
+						search_area: selectedArea.name,
+						has_orcid: orcidFilter
+					});
+					if (active) {
+						setAdvisors(response.items);
+						setTotal(response.total);
+					}
 				} else if (mode === 'area' && !selectedArea) {
-					if (active) setAdvisors([]);
+					if (active) {
+						setAdvisors([]);
+						setTotal(0);
+					}
 				}
 			} catch (err) {
 				console.error(err);
@@ -65,7 +90,7 @@ const AdvisorExplorerPage: React.FC = () => {
 
 		fetchAdvisors();
 		return () => { active = false; };
-	}, [mode, query, selectedArea, orcidFilter]);
+	}, [mode, query, selectedArea, orcidFilter, limit, offset]);
 
 	// Group areas by letter
 	const groupedAreas = useMemo(() => {
@@ -140,6 +165,7 @@ const AdvisorExplorerPage: React.FC = () => {
 								setMode('name');
 								setQuery('');
 								setSelectedArea(null);
+								setOffset(0);
 							}}
 							className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${mode === 'name'
 									? 'bg-accent dark:bg-dark-accent text-white shadow'
@@ -153,6 +179,7 @@ const AdvisorExplorerPage: React.FC = () => {
 								setMode('area');
 								setQuery('');
 								setSelectedArea(null);
+								setOffset(0);
 							}}
 							className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${mode === 'area'
 									? 'bg-accent dark:bg-dark-accent text-white shadow'
@@ -176,14 +203,24 @@ const AdvisorExplorerPage: React.FC = () => {
 									type="text"
 									placeholder="Buscar por Nombre del Asesor..."
 									value={query}
-									onChange={(e) => setQuery(e.target.value)}
+									onChange={(e) => {
+										setQuery(e.target.value);
+										setOffset(0); // reset page on search
+									}}
 									className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border dark:border-dark-border bg-bg-surface dark:bg-dark-bg-surface text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus dark:focus:ring-dark-border-focus transition-shadow text-sm"
 								/>
 							</div>
 							<OrcidFilter value={orcidFilter} onChange={setOrcidFilter} />
 						</div>
 
-						<AdvisorTable advisors={advisors} loading={loadingAdvisors} />
+						<AdvisorTable 
+							advisors={advisors} 
+							loading={loadingAdvisors} 
+							total={total} 
+							limit={limit} 
+							offset={offset} 
+							onPaginationChange={(l, o) => { setLimit(l); setOffset(o); }} 
+						/>
 					</div>
 				)}
 
@@ -210,7 +247,10 @@ const AdvisorExplorerPage: React.FC = () => {
 										type="text"
 										placeholder="Buscar Área..."
 										value={query}
-										onChange={(e) => setQuery(e.target.value)}
+										onChange={(e) => {
+											setQuery(e.target.value);
+											setOffset(0); // reset page on new area search (though it groups locally)
+										}}
 										className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border dark:border-dark-border bg-bg-surface dark:bg-dark-bg-surface text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus dark:focus:ring-dark-border-focus transition-shadow text-sm"
 									/>
 								)}
@@ -219,7 +259,14 @@ const AdvisorExplorerPage: React.FC = () => {
 						</div>
 
 						{selectedArea ? (
-							<AdvisorTable advisors={advisors} loading={loadingAdvisors} />
+							<AdvisorTable
+								advisors={advisors}
+								loading={loadingAdvisors}
+								total={total}
+								limit={limit}
+								offset={offset}
+								onPaginationChange={(l, o) => { setLimit(l); setOffset(o); }}
+							/>
 						) : (
 							<div className="pt-2">
 								{/* Alphabet Index */}

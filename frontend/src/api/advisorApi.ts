@@ -1,80 +1,63 @@
-import type { Advisor, ResearchArea, AdvisorFilters } from '../types/advisor';
-import advisorsData from '../data/mockAdvisors.json';
-import researchAreasData from '../data/mockResearchAreas.json';
+import type { Advisor, ResearchArea } from '../types/advisor';
 
-const advisors: Advisor[] = advisorsData as Advisor[];
-const researchAreas: ResearchArea[] = researchAreasData as ResearchArea[];
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// Simulate network delay
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+export interface AdvisorListResponse {
+  items: Advisor[];
+  total: number;
+  limit: number;
+  offset: number;
+}
 
 export const advisorApi = {
   /**
-   * Search advisors by name with optional orcid filter
+   * Obtiene asesores paginados y filtrados
    */
-  async searchByName(
-    query: string,
-    filters: AdvisorFilters = {}
-  ): Promise<Advisor[]> {
-    await delay(200);
-    const q = query.toLowerCase().trim();
-    return advisors.filter((a) => {
-      const nameMatch = q === '' || a.full_name.toLowerCase().includes(q);
-      const orcidMatch =
-        filters.hasOrcid === null || filters.hasOrcid === undefined
-          ? true
-          : filters.hasOrcid
-          ? a.orcid !== null
-          : a.orcid === null;
-      return nameMatch && orcidMatch;
-    });
+  async getAdvisors(
+    params: {
+      limit?: number;
+      offset?: number;
+      search_name?: string;
+      search_area?: string;
+      has_orcid?: boolean | null;
+    }
+  ): Promise<AdvisorListResponse> {
+    const url = new URL(`${API_BASE}/advisors`);
+    if (params.limit !== undefined) url.searchParams.append('limit', params.limit.toString());
+    if (params.offset !== undefined) url.searchParams.append('offset', params.offset.toString());
+    if (params.search_name) url.searchParams.append('search_name', params.search_name);
+    if (params.search_area) url.searchParams.append('search_area', params.search_area);
+    if (params.has_orcid !== undefined && params.has_orcid !== null) {
+      url.searchParams.append('has_orcid', params.has_orcid ? 'true' : 'false');
+    }
+
+    const response = await fetch(url.toString());
+    if (!response.ok) throw new Error('Error al obtener asesores');
+    return response.json();
   },
 
   /**
-   * Get advisors by research area name (exact match)
+   * Obtiene areas de investigacion, opcionalmente filtradas
    */
-  async getAdvisorsByArea(
-    areaName: string,
-    filters: AdvisorFilters = {}
-  ): Promise<Advisor[]> {
-    await delay(200);
-    return advisors.filter((a) => {
-      const areaMatch = a.research_areas.some(
-        (area) => area.toLowerCase() === areaName.toLowerCase()
-      );
-      const orcidMatch =
-        filters.hasOrcid === null || filters.hasOrcid === undefined
-          ? true
-          : filters.hasOrcid
-          ? a.orcid !== null
-          : a.orcid === null;
-      return areaMatch && orcidMatch;
-    });
+  async getResearchAreas(params: { starts_with?: string; search?: string } = {}): Promise<ResearchArea[]> {
+    const url = new URL(`${API_BASE}/metadata/research-areas`);
+    if (params.starts_with) url.searchParams.append('starts_with', params.starts_with);
+    if (params.search) url.searchParams.append('search', params.search);
+
+    const response = await fetch(url.toString());
+    if (!response.ok) throw new Error('Error al obtener areas de investigación');
+    return response.json();
   },
 
   /**
-   * Get all research areas, grouped by first letter (Spanish alphabet aware)
-   */
-  async getResearchAreas(): Promise<ResearchArea[]> {
-    await delay(100);
-    return researchAreas;
-  },
-
-  /**
-   * Search research areas by name (fuzzy)
-   */
-  async searchResearchAreas(query: string): Promise<ResearchArea[]> {
-    await delay(150);
-    const q = query.toLowerCase().trim();
-    if (!q) return researchAreas;
-    return researchAreas.filter((a) => a.name.toLowerCase().includes(q));
-  },
-
-  /**
-   * Get a single advisor by id
+   * Obtiene un asesor por su ID
    */
   async getAdvisorById(id: string): Promise<Advisor | null> {
-    await delay(150);
-    return advisors.find((a) => a.id === id) ?? null;
-  },
+    const response = await fetch(`${API_BASE}/advisors/${id}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error('Error al obtener el asesor por id');
+    }
+    return response.json();
+  }
 };

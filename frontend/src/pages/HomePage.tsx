@@ -12,7 +12,7 @@ export default function HomePage() {
 
 	if (!user) return null;
 
-	const [error, setError] = useState('');
+	//const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [stats, setStats] = useState<DbStats>();
 
@@ -22,8 +22,8 @@ export default function HomePage() {
 			.then((res) => {
 				setStats(res);
 			})
-			.catch((err) => {
-				setError(err.message);
+			.catch(() => {
+				//setError(err.message);
 			})
 			.finally(() => {
 				setLoading(false);

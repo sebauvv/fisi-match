@@ -7,6 +7,10 @@ import { ExternalLink, BookOpen, FileText } from 'lucide-react';
 interface AdvisorTableProps {
 	advisors: Advisor[];
 	loading?: boolean;
+	total: number;
+	limit: number;
+	offset: number;
+	onPaginationChange: (newLimit: number, newOffset: number) => void;
 }
 
 function extractOrcidId(orcid: string | null): string {
@@ -25,8 +29,36 @@ const SkeletonRow = () => (
 	</tr>
 );
 
-const AdvisorTable: React.FC<AdvisorTableProps> = ({ advisors, loading = false }) => {
+const AdvisorTable: React.FC<AdvisorTableProps> = ({
+	advisors,
+	loading = false,
+	total,
+	limit,
+	offset,
+	onPaginationChange,
+}) => {
 	const navigate = useNavigate();
+
+	const currentPage = Math.floor(offset / limit) + 1;
+	const totalPages = Math.ceil(total / limit) || 1;
+
+	const handlePrev = () => {
+		if (offset - limit >= 0) {
+			onPaginationChange(limit, offset - limit);
+		}
+	};
+
+	const handleNext = () => {
+		if (offset + limit < total) {
+			onPaginationChange(limit, offset + limit);
+		}
+	};
+
+	const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const newLimit = parseInt(e.target.value, 10);
+		onPaginationChange(newLimit, 0); // Reset a page 0
+	};
+
 
 	const cols = [
 		{ label: 'Nombre', className: 'w-52' },
@@ -146,6 +178,53 @@ const AdvisorTable: React.FC<AdvisorTableProps> = ({ advisors, loading = false }
 					)}
 				</tbody>
 			</table>
+
+			{/* Pagination Controls */}
+			<div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 bg-bg-surface dark:bg-dark-bg-surface border-t border-border dark:border-dark-border gap-4">
+				<div className="flex items-center gap-2">
+					<span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+						Mostrar
+					</span>
+					<select
+						value={limit}
+						onChange={handleLimitChange}
+						className="text-sm border border-border dark:border-dark-border rounded-md px-2 py-1 bg-bg-surface dark:bg-dark-bg-surface text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
+					>
+						<option value={5}>5</option>
+						<option value={10}>10</option>
+						<option value={20}>20</option>
+					</select>
+					<span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+						asesores a la vez
+					</span>
+				</div>
+
+				<div className="flex items-center gap-4">
+					<span className="text-sm text-text-muted dark:text-dark-text-muted">
+						Mostrando {advisors.length > 0 ? offset + 1 : 0} - {Math.min(offset + limit, total)} de {total}
+					</span>
+					
+					<div className="flex gap-1">
+						<button
+							onClick={handlePrev}
+							disabled={offset === 0}
+							className="px-3 py-1 rounded border border-border dark:border-dark-border text-sm font-medium text-text-secondary dark:text-dark-text-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+						>
+							Anterior
+						</button>
+						<div className="px-3 py-1 text-sm text-text-primary dark:text-dark-text-primary bg-bg-surface-alt dark:bg-dark-bg-surface-alt font-semibold rounded">
+							{currentPage} de {totalPages}
+						</div>
+						<button
+							onClick={handleNext}
+							disabled={offset + limit >= total}
+							className="px-3 py-1 rounded border border-border dark:border-dark-border text-sm font-medium text-text-secondary dark:text-dark-text-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+						>
+							Siguiente
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 };
