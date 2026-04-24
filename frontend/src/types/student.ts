@@ -50,6 +50,7 @@ export interface StudentProfile {
   cv?: {
     cv_text: string;
   };
+  thesis_idea: string;
   pdf_urls: {
     historial?: string;
     matricula?: string;
@@ -66,6 +67,7 @@ export interface AuthUser {
   periodos_academicos: AcademicPeriod[];
   resumen_creditos: CreditsSummary;
   cv_text: string;
+  thesis_idea: string;
   pdf_urls: {
     historial?: string;
     matricula?: string;

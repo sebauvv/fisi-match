@@ -51,6 +51,7 @@ export default function LoginPage() {
 					promedio_ponderado: 0,
 				},
 				cv_text: fullProfile.cv_text || '',
+				thesis_idea: fullProfile.thesis_idea || '',
 				pdf_urls: {
 					historial: fullProfile.pdf_url_historial,
 					matricula: fullProfile.pdf_url_matricula,

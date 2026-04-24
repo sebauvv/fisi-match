@@ -7,6 +7,7 @@ export interface StudentUpdatePayload {
   escuela?: string;
   plan?: string;
   cv_text?: string;
+  thesis_idea?: string;
 }
 
 function authHeaders(token: string) {

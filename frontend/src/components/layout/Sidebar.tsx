@@ -15,10 +15,14 @@ const NAV_ITEMS = [
 ];
 
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const hasIdea = !!user?.thesis_idea;
+
   return (
     <>
       {/* Backdrop overlay */}
@@ -49,24 +53,33 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Navigation items */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-          {NAV_ITEMS.map(({ label, icon: Icon, path }) => (
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4 custom-scrollbar">
+          {NAV_ITEMS.map(({ label, icon: Icon, path }) => {
+            const isLocked = !hasIdea && ['Recomendacion de Asesor', 'Reporte de Alineamiento', 'Recomendacion de Temas Alternativos'].includes(label);
+            
+            return (
             <button
               key={label}
+              disabled={isLocked}
+              title={isLocked ? "Sube tu Idea de Tesis primero" : ""}
               onClick={() => {
+                if (isLocked) return;
                 if (path !== '#') navigate(path);
                 onClose();
               }}
               className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors ${
-                location.pathname.startsWith(path) && path !== '#'
-                  ? 'bg-bg-hover text-text-primary dark:bg-dark-bg-hover dark:text-dark-text-primary'
-                  : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary dark:text-dark-text-secondary dark:hover:bg-dark-bg-hover dark:hover:text-dark-text-primary'
+                isLocked 
+                  ? 'text-text-muted cursor-not-allowed opacity-50 dark:text-dark-text-muted'
+                  : location.pathname.startsWith(path) && path !== '#'
+                    ? 'bg-bg-hover text-text-primary dark:bg-dark-bg-hover dark:text-dark-text-primary'
+                    : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary dark:text-dark-text-secondary dark:hover:bg-dark-bg-hover dark:hover:text-dark-text-primary'
               }`}
             >
               <Icon className="h-4.5 w-4.5 shrink-0" />
               {label}
             </button>
-          ))}
+            );
+          })}
         </nav>
 
         {/* Footer */}

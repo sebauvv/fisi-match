@@ -77,6 +77,7 @@ export default function RegisterPage() {
 					periodos_academicos: profile.historial.periodos_academicos,
 					resumen_creditos: profile.historial.resumen_creditos,
 					cv_text: profile.cv?.cv_text || '',
+					thesis_idea: '',
 					pdf_urls: profile.pdf_urls,
 				};
 				login(user, authRes.access_token);
