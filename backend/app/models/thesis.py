@@ -42,3 +42,11 @@ class Thesis(SQLModel, table=True):
         index=True,
     )
     advisor_name: Optional[str] = None
+
+
+class ThesisSubject(SQLModel, table=True):
+    __tablename__ = "thesis_subjects"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True, index=True)
+    thesis_count: int = Field(default=0)
