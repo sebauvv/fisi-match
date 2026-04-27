@@ -86,3 +86,54 @@ output "lambda_arn" {
 output "lambda_role_id" {
   value = aws_iam_role.lambda_role.id
 }
+
+# IAM User para invocar el Lambda desde el backend (sin SSO)
+
+resource "aws_iam_user" "backend_invoker" {
+  name = "${var.lambda_function_name}_BackendInvoker"
+}
+
+resource "aws_iam_policy" "backend_invoke_policy" {
+  name        = "${var.lambda_function_name}_InvokePolicy"
+  description = "Permite al backend de FastAPI invocar el Lambda de recomendacion"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
+        Resource = aws_lambda_function.advisor_recommender.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "backend_invoker_attach" {
+  user       = aws_iam_user.backend_invoker.name
+  policy_arn = aws_iam_policy.backend_invoke_policy.arn
+}
+
+resource "aws_iam_access_key" "backend_invoker_key" {
+  user = aws_iam_user.backend_invoker.name
+}
+
+output "backend_invoker_access_key_id" {
+  description = "Agregar como ADVISOR_LAMBDA_ACCESS_KEY_ID en el .env del backend"
+  value       = aws_iam_access_key.backend_invoker_key.id
+}
+
+output "backend_invoker_secret_access_key" {
+  description = "Agregar como ADVISOR_LAMBDA_SECRET_ACCESS_KEY en el .env del backend"
+  value       = aws_iam_access_key.backend_invoker_key.secret
+  sensitive   = true
+}
+
+output "advisor_lambda_function_name" {
+  description = "Agregar como ADVISOR_LAMBDA_FUNCTION en el .env del backend"
+  value       = aws_lambda_function.advisor_recommender.function_name
+}
+
+output "advisor_lambda_region" {
+  description = "Region del Lambda (AWS_REGION equivalente)"
+  value       = var.aws_region
+}

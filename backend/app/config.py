@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     # Lambdas
     pdf_lambda_function: str = os.getenv("PDF_LAMBDA_FUNCTION")
     advisor_lambda_function: str = os.getenv("ADVISOR_LAMBDA_FUNCTION")
+    advisor_lambda_access_key_id: str = os.getenv("ADVISOR_LAMBDA_ACCESS_KEY_ID", "")
+    advisor_lambda_secret_access_key: str = os.getenv("ADVISOR_LAMBDA_SECRET_ACCESS_KEY", "")
+    advisor_lambda_region: str = os.getenv("ADVISOR_LAMBDA_REGION", "us-east-2")
 
     # PostgreSQL
     db_host: str = os.getenv("DB_HOST")

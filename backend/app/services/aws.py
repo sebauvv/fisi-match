@@ -43,6 +43,23 @@ def get_lambda_client():
     return boto3.client("lambda", region_name=settings.aws_region)
 
 
+def get_advisor_lambda_client():
+    """
+    Crea cliente Lambda con credenciales IAM exclusivas del usuario
+    BackendInvoker generado en Terraform para el motor de recomendacion.
+    Utiliza ADVISOR_LAMBDA_ACCESS_KEY_ID / ADVISOR_LAMBDA_SECRET_ACCESS_KEY del .env.
+    """
+    if settings.advisor_lambda_access_key_id and settings.advisor_lambda_secret_access_key:
+        return boto3.client(
+            "lambda",
+            region_name=settings.advisor_lambda_region,
+            aws_access_key_id=settings.advisor_lambda_access_key_id,
+            aws_secret_access_key=settings.advisor_lambda_secret_access_key,
+        )
+    # Fallback: usa la cadena de credenciales por defecto de boto3
+    return boto3.client("lambda", region_name=settings.advisor_lambda_region)
+
+
 
 async def upload_to_s3(s3_client, file: UploadFile, prefix: str) -> str:
     """Sube un archivo a S3 y retorna la key generada."""
