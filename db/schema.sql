@@ -191,3 +191,25 @@ CREATE TRIGGER trg_students_updated_at
 
 ALTER TABLE students
   ADD COLUMN IF NOT EXISTS thesis_idea TEXT DEFAULT '';
+
+-- Historial de evaluaciones de alineamiento estudiante-tema (Fase 6)
+CREATE TABLE IF NOT EXISTS alignment_reports (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id          UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+  thesis_idea         TEXT NOT NULL,
+  -- Clasificacion LLM
+  alignment_level     TEXT NOT NULL CHECK (alignment_level IN ('Alta', 'Media', 'Baja')),
+  score_pct           INT  NOT NULL CHECK (score_pct BETWEEN 0 AND 100),
+  -- Narrativas clave (aplanadas para generacion rapida de PDF)
+  topic_requirements  TEXT,
+  student_profile_summary TEXT,
+  justification       TEXT NOT NULL,
+  student_strengths   TEXT,
+  skill_gaps          TEXT,
+  -- Respuesta JSON completa del LLM (para uso futuro y la api)
+  report_json         JSONB NOT NULL,
+  created_at          TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ar_student_id ON alignment_reports(student_id);
+CREATE INDEX IF NOT EXISTS idx_ar_created_at ON alignment_reports(created_at DESC);
