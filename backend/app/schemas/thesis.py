@@ -13,6 +13,7 @@ class ThesisListItem(BaseModel):
     advisor_id: Optional[str] = None
     degree_level: Optional[str] = None
     degree_name: Optional[str] = None
+    handle_url: Optional[str] = None
 
 
 class ThesisRead(ThesisListItem):

@@ -7,6 +7,7 @@ export interface Thesis {
 	advisor_id: string;
 	degree_level: string;
 	degree_name: string | null;
+	handle_url: string | null;
 }
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
