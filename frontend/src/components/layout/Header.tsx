@@ -52,8 +52,8 @@ export default function Header({ onToggleSidebar, onOpenThesisModal }: HeaderPro
 
 			{/* Warning Banner Contextualized */}
 			{!useAuth().user?.thesis_idea && (
-				<button 
-					onClick={onOpenThesisModal} 
+				<button
+					onClick={onOpenThesisModal}
 					className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium hover:bg-yellow-500/20 border border-yellow-500/20 transition-colors whitespace-nowrap"
 				>
 					<span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse hidden sm:block"></span>
@@ -87,7 +87,7 @@ export default function Header({ onToggleSidebar, onOpenThesisModal }: HeaderPro
 					{showMenu && (
 						<div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-bg-surface py-1 shadow-xl dark:border-dark-border dark:bg-dark-bg-surface">
 							<button
-								onClick={() => { setShowMenu(false); /* profile page (future) */ }}
+								onClick={() => { setShowMenu(false); navigate('/profile'); }}
 								className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-text-primary transition-colors hover:bg-bg-hover dark:text-dark-text-primary dark:hover:bg-dark-bg-hover"
 							>
 								<User className="h-4 w-4 text-text-muted dark:text-dark-text-muted" />
