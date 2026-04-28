@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     db_name: str = os.getenv("DB_NAME")
     db_user: str = os.getenv("DB_USER")
     db_password: str = os.getenv("DB_PASSWORD")
+    database_url: str = os.getenv("DATABASE_URL")
 
     # JWT
     jwt_secret: str = os.getenv("JWT_SECRET")
