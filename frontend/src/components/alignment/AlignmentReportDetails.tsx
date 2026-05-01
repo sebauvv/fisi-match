@@ -96,6 +96,35 @@ export function AlignmentReportDetails({ report }: AlignmentReportDetailsProps) 
             </span>
           </div>
         </div>
+
+        {/* Skill Bars */}
+        {json.skill_bars && json.skill_bars.length > 0 && (
+          <>
+            <div className="h-[1px] bg-border my-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {json.skill_bars.map((bar, i) => {
+                let barColor = 'var(--color-error)';
+                if (bar.percentage >= 75) barColor = 'var(--color-success)';
+                else if (bar.percentage >= 40) barColor = 'var(--color-accent)';
+
+                return (
+                  <div key={i} className="flex flex-col gap-[6px]">
+                    <div className="flex justify-between text-[12px] text-text-muted">
+                      <span>{bar.name}</span>
+                      <span>{bar.percentage}%</span>
+                    </div>
+                    <div className="h-[6px] bg-bg-surface-alt rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${bar.percentage}%`, backgroundColor: barColor }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Grid Cards */}
@@ -113,12 +142,25 @@ export function AlignmentReportDetails({ report }: AlignmentReportDetailsProps) 
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            {json.student_strengths?.map((str, i) => (
-              <div key={i} className="flex gap-[10px] items-start text-[13px] leading-[1.5] text-text-secondary">
-                <div className="w-[6px] h-[6px] rounded-full bg-success mt-[6px] shrink-0" />
-                <span>{str.replace(/^- /, '')}</span>
-              </div>
-            ))}
+            {json.student_strengths?.map((str, i) => {
+              const splitIdx = str.indexOf(':');
+              let boldPart = '';
+              let restPart = str.replace(/^- /, '');
+              if (splitIdx > 0 && splitIdx < 120) {
+                boldPart = str.substring(0, splitIdx + 1).replace(/^- /, '');
+                restPart = str.substring(splitIdx + 1);
+              }
+              
+              return (
+                <div key={i} className="flex gap-[10px] items-start text-[13px] leading-[1.5] text-text-secondary">
+                  <div className="w-[6px] h-[6px] rounded-full bg-success mt-[6px] shrink-0" />
+                  <span>
+                    {boldPart && <strong className="font-semibold text-text-primary mr-1">{boldPart}</strong>}
+                    {restPart}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -139,7 +181,7 @@ export function AlignmentReportDetails({ report }: AlignmentReportDetailsProps) 
               const splitIdx = gap.indexOf(':');
               let boldPart = '';
               let restPart = gap.replace(/^- /, '');
-              if (splitIdx > 0 && splitIdx < 50) {
+              if (splitIdx > 0 && splitIdx < 120) {
                 boldPart = gap.substring(0, splitIdx + 1).replace(/^- /, '');
                 restPart = gap.substring(splitIdx + 1);
               }
@@ -216,6 +258,25 @@ export function AlignmentReportDetails({ report }: AlignmentReportDetailsProps) 
         </div>
 
       </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2.5 mt-1 pb-4">
+        <button
+          onClick={() => alert('Descargando PDF...')}
+          className="inline-flex items-center gap-2 py-[0.65rem] px-[1.25rem] bg-accent text-white border-[1.5px] border-accent rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all duration-150 hover:bg-accent-hover hover:border-accent-hover"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[15px] h-[15px] text-white/80"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar Reporte PDF
+        </button>
+        <button
+          onClick={() => alert('Compartiendo...')}
+          className="inline-flex items-center gap-2 py-[0.65rem] px-[1.25rem] bg-bg-surface text-text-primary border-[1.5px] border-border rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all duration-150 hover:bg-bg-hover hover:border-border-focus"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[15px] h-[15px] text-text-secondary"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartir
+        </button>
+      </div>
+
     </div>
   );
 }

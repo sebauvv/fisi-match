@@ -3,12 +3,18 @@ export interface RelevantCourse {
   relevance: string;
 }
 
+export interface SkillBar {
+  name: string;
+  percentage: number;
+}
+
 export interface ReportJson {
   alignment_level: string;
   score_pct: number;
   topic_requirements: string;
   student_profile_summary: string;
   justification: string;
+  skill_bars?: SkillBar[];
   student_strengths: string[];
   skill_gaps: string[];
   relevant_courses?: RelevantCourse[];
