@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { label: 'Explorador de Tesis', icon: BookOpen, path: '#' },
   { label: 'Explorador de Articulos Externos', icon: FileText, path: '#' },
   { label: 'Recomendacion de Asesor', icon: Compass, path: '/recomendacion-asesor' },
-  { label: 'Reporte de Alineamiento', icon: ClipboardList, path: '#' },
+  { label: 'Reporte de Alineamiento', icon: ClipboardList, path: '/reporte-alineamiento' },
   { label: 'Recomendacion de Temas Alternativos', icon: Lightbulb, path: '#' },
 ];
 

@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import AdvisorExplorerPage from './pages/AdvisorExplorerPage';
 import AdvisorProfilePage from './pages/AdvisorProfilePage';
 import AdvisorRecommendationPage from './pages/AdvisorRecommendationPage';
+import AlignmentEvaluatorPage from './pages/AlignmentEvaluatorPage';
 import ProfilePage from './pages/ProfilePage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/explorador-profesores" element={<AdvisorExplorerPage />} />
           <Route path="/explorador-profesores/:id" element={<AdvisorProfilePage />} />
           <Route path="/recomendacion-asesor" element={<AdvisorRecommendationPage />} />
+          <Route path="/reporte-alineamiento" element={<AlignmentEvaluatorPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
