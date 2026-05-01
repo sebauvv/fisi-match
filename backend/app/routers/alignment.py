@@ -47,7 +47,7 @@ def generate_alignment_report(
             "thesis_idea": student.thesis_idea
         }
     }
-    
+
     lambda_client = get_alignment_lambda_client()
 
     try:
@@ -89,7 +89,7 @@ def generate_alignment_report(
     if "error" in report_data:
         raise HTTPException(status_code=400, detail=report_data["error"])
 
-    # Aplanar arrays para texto
+    # Aplana arrays para texto
     def flatten_to_text(field_data):
         if not field_data:
             return None
@@ -97,7 +97,7 @@ def generate_alignment_report(
             return "\n".join(f"- {item}" for item in field_data)
         return str(field_data)
 
-    # Crear registro en la BD
+    # Crea registro en la BD
     alignment_report = AlignmentReport(
         student_id=student.id,
         thesis_idea=student.thesis_idea,

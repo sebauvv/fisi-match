@@ -8,7 +8,7 @@ from typing import Any, Optional
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, text
 
 
 class AlignmentReport(SQLModel, table=True):
@@ -37,4 +37,7 @@ class AlignmentReport(SQLModel, table=True):
         sa_column=Column(JSONB, nullable=False)
     )
     
-    created_at: Optional[datetime] = Field(default=None)
+    created_at: Optional[datetime] = Field(
+        default_factory=datetime.utcnow,
+        sa_column_kwargs={"server_default": text("now()")}
+    )
