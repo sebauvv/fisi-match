@@ -1,0 +1,2 @@
+# Lambda packaging dependencies only (no psycopg2 — Lambda doesn't hit DB)
+boto3>=1.35.0
