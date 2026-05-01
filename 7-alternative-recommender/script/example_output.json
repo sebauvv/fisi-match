@@ -1,0 +1,161 @@
+{
+	"summary": "Tu perfil presenta una alineación media con el tema de tesis propuesto, lo que significa que tienes una base técnica sólida pero necesitas adquirir conocimientos críticos en el dominio específico de nutrición y sistemas de recomendación especializados. Tu desempeño excepcional en Inteligencia Artificial (17/20), Minería de Datos (16/20) y tus habilidades comprobadas en Python, desarrollo full-stack y bases de datos son activos valiosos que te permiten abordar este proyecto. Sin embargo, las brechas principales radican en tres áreas: (1) conocimiento práctico de nutrición clínica y dietética, (2) algoritmos avanzados de sistemas de recomendación personalizados, y (3) regulaciones y consideraciones éticas en sistemas de salud. La buena noticia es que estas brechas son cerrable en un plazo razonable (16-20 semanas) con dedicación enfocada. Este documento te proporciona un camino estructurado para fortalecer tu preparación y transformar tu proyecto en una tesis robusta y académicamente sólida. Recomendamos que comiences con los cursos fundamentales en nutrición y profundices progresivamente en algoritmos avanzados, mientras ejecutas mini-proyectos que integren el conocimiento técnico con el dominio de salud.",
+	"skill_gaps_to_close": [
+		{
+			"skill": "Nutrición clínica y dietética básica",
+			"resource": "Curso 'Nutrición Clínica y Dietética Médica' de Coursera (Johns Hopkins University) o 'Introduction to Nutrition' del MIT OpenCourseWare. Complementar con el libro 'Krause's Food, Nutrition, and Diet Therapy' (L. Kathleen Mahan et al.)",
+			"estimated_time": "6-8 semanas"
+		},
+		{
+			"skill": "Algoritmos avanzados de sistemas de recomendación",
+			"resource": "Curso 'Recommender Systems' de Coursera (University of Minnesota) que cubre filtrado colaborativo, content-based, híbrido y redes neuronales profundas para recomendación",
+			"estimated_time": "5-7 semanas"
+		},
+		{
+			"skill": "Deep Learning y redes neuronales para sistemas de recomendación",
+			"resource": "Curso 'Deep Learning for Recommender Systems' de Coursera o 'Neural Networks for Recommender Systems' disponible en edX. Documentación oficial de TensorFlow y PyTorch para implementación",
+			"estimated_time": "6-8 semanas"
+		},
+		{
+			"skill": "Regulaciones de privacidad y seguridad en sistemas de salud (HIPAA, RGPD)",
+			"resource": "Curso 'Healthcare Privacy, Security, and Compliance' en Coursera (University of Colorado) o 'Data Privacy and Protection' en edX. Documentación oficial de HIPAA del US Department of Health & Human Services",
+			"estimated_time": "3-4 semanas"
+		},
+		{
+			"skill": "Ética y responsabilidad clínica en sistemas inteligentes de salud",
+			"resource": "Curso 'AI and Healthcare Ethics' del MIT OpenCourseWare o 'Ethical AI in Healthcare' en Coursera. Lectura de artículos peer-reviewed en revistas como 'Nature Medicine' sobre ética en IA médica",
+			"estimated_time": "3-4 semanas"
+		},
+		{
+			"skill": "Validación clínica y ensayos de efectividad de sistemas de recomendación",
+			"resource": "Curso 'Clinical Trial Design and Management' en Coursera. Lectura de protocolos de validación en artículos de 'Journal of Medical Internet Research' (JMIR). Guía de la FDA sobre software médico",
+			"estimated_time": "4-5 semanas"
+		},
+		{
+			"skill": "Big Data Analytics en contextos clínicos",
+			"resource": "Curso 'Big Data for Healthcare' en Coursera (UC San Diego) o 'Healthcare Data Science' en edX. Herramientas: Spark, Hadoop con datasets de salud públicos (MIMIC, NIH Open Data)",
+			"estimated_time": "4-6 semanas"
+		},
+		{
+			"skill": "Curación y calidad de datasets nutricionales",
+			"resource": "Documentación de USDA Food Data Central, FatSecret API, nutritionix. Curso 'Data Wrangling and Cleaning' en Coursera. Estándares: ISO 8601, SNOMED CT para terminología médica",
+			"estimated_time": "3-4 semanas"
+		}
+	],
+	"recommended_courses": [
+		{
+			"name": "Nutritional Science and Diet Therapy",
+			"platform": "Coursera",
+			"reason": "Cierra la brecha crítica en conocimiento de nutrición clínica. Cubre macronutrientes, micronutrientes, requerimientos calóricos personalizados y patologías nutricionales específicas necesarias para diseñar un motor de recomendación competente"
+		},
+		{
+			"name": "Recommender Systems Specialization",
+			"platform": "Coursera",
+			"reason": "Especialización completa en algoritmos de recomendación: filtrado colaborativo, content-based, técnicas híbridas y evaluación de sistemas. Directamente aplicable a la arquitectura técnica de tu tesis"
+		},
+		{
+			"name": "Deep Learning Specialization",
+			"platform": "Coursera",
+			"reason": "Aunque tienes base en IA, esta especialización profundiza en redes neuronales convolucionales, recurrentes y arquitecturas modernas aplicables a sistemas de recomendación especializados para salud"
+		},
+		{
+			"name": "Healthcare Privacy, Security, and Compliance",
+			"platform": "Coursera",
+			"reason": "Aborda regulaciones HIPAA y estándares de seguridad en sistemas de salud, conocimiento ausente en tu formación actual pero crítico para un sistema que maneja datos sensibles de usuarios"
+		},
+		{
+			"name": "AI and Healthcare Ethics",
+			"platform": "MIT OpenCourseWare",
+			"reason": "Proporciona marco ético y de responsabilidad clínica en sistemas inteligentes, esencial para una tesis académica rigurosa que no solo implemente tecnología sino que la contextualice éticamente"
+		},
+		{
+			"name": "Clinical Trial Design and Implementation",
+			"platform": "Coursera",
+			"reason": "Enseña metodología para validación clínica y diseño de ensayos de efectividad, necesario para demostrar el impacto real de tu sistema de recomendación en contextos clínicos reales"
+		},
+		{
+			"name": "Big Data for Healthcare",
+			"platform": "Coursera",
+			"reason": "Cubre análisis de grandes volúmenes de datos en contextos sanitarios, herramientas y consideraciones específicas que complementan tu experiencia en Minería de Datos con perspectiva clínica"
+		},
+		{
+			"name": "Advanced SQL for Data Analysis",
+			"platform": "DataCamp o Coursera",
+			"reason": "Profundiza en consultas complejas y optimización de bases de datos clínicas, complementando tu ya sólida base en MySQL y PostgreSQL con técnicas avanzadas para datasets de salud"
+		}
+	],
+	"mini_projects": [
+		{
+			"title": "Analizador de Perfil Nutricional Personalizado",
+			"description": "Construye una aplicación Python que reciba datos básicos de un usuario (edad, sexo, actividad física, condiciones de salud) y calcule requerimientos calóricos, macronutrientes y micronutrientes según guías nutricionales estándar (USDA, OMS). Integra una base de datos de alimentos con información nutricional y genera reportes personalizados. Este proyecto te introduce al dominio de nutrición clínica mientras aplicas tu experiencia en Python y bases de datos.",
+			"skills_covered": [
+				"Nutrición clínica básica",
+				"Cálculos de requerimientos nutricionales",
+				"Manipulación de datos con Pandas",
+				"Diseño de base de datos de alimentos",
+				"Generación de reportes"
+			]
+		},
+		{
+			"title": "Prototipo de Sistema de Recomendación Colaborativo para Alimentos",
+			"description": "Implementa un motor de recomendación de alimentos usando filtrado colaborativo con datos sintéticos o públicos de preferencias nutricionales. Compara desempeño entre técnicas: vecindad más cercana (k-NN), factorización matricial y redes neuronales profundas. Crea métricas de evaluación (RMSE, MAE, precisión) e integra en una API REST con Express.js o Nest.js. Este proyecto integra machine learning avanzado con tu stack full-stack.",
+			"skills_covered": [
+				"Algoritmos colaborativos de recomendación",
+				"Factorización matricial",
+				"Redes neuronales para recomendación",
+				"Métricas de evaluación",
+				"Desarrollo de APIs REST"
+			]
+		},
+		{
+			"title": "Dashboard de Monitoreo Nutricional con Visualización Avanzada",
+			"description": "Desarrolla un dashboard interactivo en React que visualice datos nutricionales de usuarios ficticicios: ingesta calórica diaria, adherencia a macronutrientes, evolución de peso, alertas de deficiencias. Incluye gráficos interactivos con Chart.js o D3.js. Implementa autenticación y almacenamiento en MongoDB. Este proyecto aplica tu experiencia en UX/UI a un contexto clínico real y demuestra comprensión de consideraciones de usabilidad en sistemas de salud.",
+			"skills_covered": [
+				"Desarrollo full-stack en React",
+				"Visualización de datos sanitarios",
+				"Diseño centrado en usuario para salud",
+				"Autenticación segura",
+				"Gestión de datos sensibles"
+			]
+		},
+		{
+			"title": "Validador de Cumplimiento HIPAA para Aplicación de Recomendación Nutricional",
+			"description": "Crea un documento técnico y prototipo que implemente controles HIPAA en una aplicación de recomendación: encriptación de datos en tránsito y reposo, auditoría de accesos, consentimiento informado, anonimización de datos. Aunque pequeño, este proyecto te familiariza con regulaciones de salud y demuestra conciencia de privacidad crítica para una tesis profesional.",
+			"skills_covered": [
+				"Regulaciones HIPAA",
+				"Encriptación de datos",
+				"Auditoría y logging",
+				"Consentimiento informado",
+				"Privacidad en sistemas de salud"
+			]
+		},
+		{
+			"title": "Estudio Comparativo de Algoritmos de Recomendación Nutricional",
+			"description": "Realiza un análisis experimental comparando 3-4 enfoques de recomendación (content-based, colaborativo híbrido, redes neuronales profundas) usando un dataset de nutrición público (USDA FoodData Central o similar). Documenta metodología, métricas de desempeño e impacto clínico hipotético. Presenta resultados en formato académico con visualizaciones. Este proyecto simula el trabajo de investigación de tu tesis y demuestra rigor metodológico.",
+			"skills_covered": [
+				"Diseño experimental",
+				"Algoritmos avanzados de recomendación",
+				"Análisis comparativo",
+				"Métricas de rendimiento clínico",
+				"Escritura académica"
+			]
+		}
+	],
+	"alternative_topics": [
+		{
+			"title": "Herramienta de Análisis de Adherencia Dietética Personalizada con Machine Learning",
+			"justification": "Este tema reduce significativamente la complejidad en la definición de recomendaciones nutricionales (que requiere expertise clínico profundo) enfocándose en monitoreo y análisis de lo que el usuario ya consume. Aprovecha tu fortaleza en machine learning y data analytics mientras mantiene relevancia en salud, pero con menor requerimiento de conocimiento nutricional especializado inicialmente.",
+			"delta_from_current": "Diferencia clave: en lugar de generar recomendaciones nutricionales complejas, el sistema monitorea patrones de consumo existentes, detecta deficiencias y proporciona retroalimentación. Permite aplicar clustering y clasificación (Minería de Datos 16/20) para segmentar patrones de usuarios. Requiere menos dominio de nutrición clínica profunda pero sigue siendo aplicación de salud con impacto real. Aprovecha tu experiencia en análisis de datos sin necesitar especialización en dietética."
+		},
+		{
+			"title": "Plataforma Inteligente de Gestión de Alergias e Intolerancias Alimentarias",
+			"justification": "Tema más acotado que sistema de recomendación completo. Se enfoca en usar machine learning para identificar interacciones entre alimentos, medicamentos e intolerancias individuales. Requiere conocimiento de nutrición menos profundo (basado en restricciones claras) pero sigue siendo aplicación clínica. Permite aplicar directamente algoritmos de recomendación (filtrar alimentos seguros) sin diseñar complejas fórmulas de nutrición personalizada.",
+			"delta_from_current": "Este tema se enfoca en reglas médicas claras (alergias documentadas, incompatibilidades conocidas) y machine learning para detectar patrones de síntomas. Requiere menos teoría de nutrición clínica profunda pero mantiene complejidad técnica en algoritmos de recomendación restrictiva. Aprovecha fortalezas en tu modelado de datos y lógica de restricciones sin requerir formación extensa en macronutrientes y metabolismo."
+		},
+		{
+			"title": "Sistema de Predicción de Riesgos Nutricionales en Poblaciones con Enfermedades Crónicas",
+			"justification": "En lugar de recomendar alimentos específicos, el sistema predice riesgo de malnutrición o complicaciones basándose en datos demográficos y clínicos. Transforma el problema en clasificación/predicción (strengths en IA y ML) con menos necesidad de diseñar recomendaciones complejas. Mantiene rigor clínico y relevancia en salud pero con enfoque predictivo donde destaca tu experiencia en modelos.",
+			"delta_from_current": "Diferencia fundamental: cambio de problema de recomendación generativa (difícil sin expertise nutritivo) a predicción clasificatoria (donde destaca tu base en IA y ML). Requiere menos conocimiento de nutrición detallada pero sigue siendo aplicación de salud importante. Permite aplicar directly modelos que ya dominas (árboles de decisión, random forests, redes neuronales para clasificación) con datasets clínicos públicos disponibles."
+		}
+	]
+}
