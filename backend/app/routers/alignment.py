@@ -19,6 +19,29 @@ settings = get_settings()
 router = APIRouter(prefix="/students", tags=["alignment"])
 
 
+from typing import List
+
+@router.get("/{student_id}/alignment", response_model=List[AlignmentReportRead])
+def get_alignment_reports(
+    student_id: uuid.UUID,
+    db: Session = Depends(get_session),
+    current_id: str = Depends(get_current_student_id),
+):
+    """Obtiene el historial de reportes de alineamiento del estudiante."""
+    if str(student_id) != current_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Sin acceso al perfil de otro estudiante",
+        )
+
+    statement = (
+        select(AlignmentReport)
+        .where(AlignmentReport.student_id == student_id)
+        .order_by(AlignmentReport.created_at.desc())
+    )
+    reports = db.exec(statement).all()
+    return reports
+
 @router.post("/{student_id}/alignment", response_model=AlignmentReportRead)
 def generate_alignment_report(
     student_id: uuid.UUID,
