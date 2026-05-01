@@ -61,6 +61,22 @@ def get_advisor_lambda_client():
 
 
 
+def get_alignment_lambda_client():
+    """
+    Crea cliente Lambda con credenciales IAM exclusivas para
+    el Alignment Evaluator.
+    Utiliza ALIGNMENT_LAMBDA_ACCESS_KEY_ID / ALIGNMENT_LAMBDA_SECRET_ACCESS_KEY del .env.
+    """
+    if settings.alignment_lambda_access_key_id and settings.alignment_lambda_secret_access_key:
+        return boto3.client(
+            "lambda",
+            region_name=settings.alignment_lambda_region,
+            aws_access_key_id=settings.alignment_lambda_access_key_id,
+            aws_secret_access_key=settings.alignment_lambda_secret_access_key,
+        )
+    return boto3.client("lambda", region_name=settings.alignment_lambda_region)
+
+
 async def upload_to_s3(s3_client, file: UploadFile, prefix: str) -> str:
     """Sube un archivo a S3 y retorna la key generada."""
     content = await file.read()

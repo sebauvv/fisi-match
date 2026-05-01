@@ -8,6 +8,7 @@ from app.schemas.student import (
 from app.schemas.advisor import AdvisorListItem, AdvisorRead
 from app.schemas.thesis import ThesisListItem, ThesisRead
 from app.schemas.publication import PublicationRead
+from app.schemas.alignment import AlignmentReportRead
 
 __all__ = [
     "LoginRequest",
@@ -20,4 +21,5 @@ __all__ = [
     "ThesisListItem",
     "ThesisRead",
     "PublicationRead",
+    "AlignmentReportRead",
 ]
