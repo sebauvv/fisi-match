@@ -14,6 +14,7 @@ class AlignmentReportRead(BaseModel):
     topic_requirements: Optional[str] = None
     student_profile_summary: Optional[str] = None
     justification: str
+    skill_bars: Optional[str] = None
     student_strengths: Optional[str] = None
     skill_gaps: Optional[str] = None
     report_json: Any

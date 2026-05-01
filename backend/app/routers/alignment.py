@@ -129,6 +129,7 @@ def generate_alignment_report(
         topic_requirements=flatten_to_text(report_data.get("topic_requirements")),
         student_profile_summary=flatten_to_text(report_data.get("student_profile_summary")),
         justification=flatten_to_text(report_data.get("justification")) or "Sin justificación",
+        skill_bars=json.dumps(report_data.get("skill_bars", [])) if report_data.get("skill_bars") else None,
         student_strengths=flatten_to_text(report_data.get("student_strengths")),
         skill_gaps=flatten_to_text(report_data.get("skill_gaps")),
         report_json=report_data,
