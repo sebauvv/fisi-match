@@ -24,10 +24,11 @@ REGLAS ESTRICTAS:
 - Los mini-proyectos deben ser realizables en 2-6 semanas por un estudiante universitario.
 - Los temas alternativos deben ser alcanzables con el perfil actual del estudiante, con una variación realista respecto al tema original.
 - El campo "summary" debe ser un párrafo motivador y honesto de al menos 100 palabras.
+- Solo debes recomendar un máximo de 6 skills gaps, 4 cursos recomendados, 3 mini-proyectos y 3 temas alternativos.
 
 ESQUEMA JSON DE RESPUESTA (respeta exactamente estos campos y tipos):
 {
-  "summary": "Párrafo motivador de al menos 100 palabras que contextualiza las recomendaciones...",
+  "summary": "Párrafo motivador de maximo 100 palabras que contextualiza las recomendaciones...",
   "skill_gaps_to_close": [
     {
       "skill": "Nombre de la habilidad o área faltante",

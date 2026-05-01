@@ -2,7 +2,7 @@
 Local script para generar recomendaciones de mejora (Fase 7).
 
 Lee la evaluacion de alineamiento mas reciente del estudiante desde la DB,
-llama a AWS Bedrock con el perfil SSO 'Ecomm-Seba', y muestra el JSON
+llama a AWS Bedrock con un perfil SSO '', y muestra el JSON
 con recomendaciones, temas alternativos y mini-proyectos.
 
 Uso:
@@ -26,10 +26,7 @@ LLM_MODEL   = os.getenv("LLM_MODEL", "us.anthropic.claude-haiku-4-5-20251001-v1:
 PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "system_prompt.txt")
 
 
-# ---------------------------------------------------------------------------
 # DB helpers
-# ---------------------------------------------------------------------------
-
 def get_db_conn():
     url = os.getenv("DATABASE_URL")
     if url:
@@ -70,10 +67,7 @@ def fetch_alignment_report(conn, student_id: str, report_id: str = None) -> dict
     return dict(row)
 
 
-# ---------------------------------------------------------------------------
 # Bedrock helpers
-# ---------------------------------------------------------------------------
-
 def get_bedrock_client():
     session = boto3.Session(profile_name="Ecomm-Seba", region_name=AWS_REGION)
     return session.client(
@@ -124,10 +118,7 @@ def call_bedrock(bedrock_client, system_prompt: str, report_json: dict) -> dict:
     return _extract_json(text)
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
-
 def main():
     parser = argparse.ArgumentParser(
         description="Generador de recomendaciones alternativas (Fase 7)"
