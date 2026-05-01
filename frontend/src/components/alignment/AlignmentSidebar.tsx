@@ -32,13 +32,13 @@ export function AlignmentSidebar({
   const getBadgeClass = (level: string) => {
     switch (level.toLowerCase()) {
       case 'alta':
-        return 'bg-success-soft text-success';
+        return 'bg-success-soft text-success dark:bg-dark-success-soft dark:text-dark-success';
       case 'media':
-        return 'bg-warning-soft text-warning';
+        return 'bg-warning-soft text-warning dark:bg-dark-warning-soft dark:text-dark-warning';
       case 'baja':
-        return 'bg-error-soft text-error';
+        return 'bg-error-soft text-error dark:bg-dark-error-soft dark:text-dark-error';
       default:
-        return 'bg-bg-surface-alt text-text-secondary';
+        return 'bg-bg-surface-alt text-text-secondary dark:bg-dark-bg-surface-alt dark:text-dark-text-secondary';
     }
   };
 
@@ -56,21 +56,21 @@ export function AlignmentSidebar({
   };
 
   return (
-    <aside className="bg-bg-surface border-r border-border flex flex-col p-6 pt-6 pb-6 gap-0 w-[300px] shrink-0 h-full overflow-hidden">
-      <p className="text-[10px] font-semibold tracking-[0.1em] uppercase text-text-muted mb-3">
+    <aside className="bg-bg-surface border-r border-border flex flex-col p-6 pt-6 pb-6 gap-0 w-[300px] shrink-0 h-full overflow-hidden dark:bg-dark-bg-surface dark:border-dark-border">
+      <p className="text-[10px] font-semibold tracking-[0.1em] uppercase text-text-muted mb-3 dark:text-dark-text-muted">
         Nueva evaluación
       </p>
       
       <div className="flex flex-col gap-2 mb-5">
-        <label className="text-[13px] font-medium text-text-secondary">Idea de tesis</label>
+        <label className="text-[13px] font-medium text-text-secondary dark:text-dark-text-secondary">Idea de tesis</label>
         <textarea
-          className="w-full p-3 font-sans text-[13px] leading-relaxed text-text-primary bg-bg-primary border-[1.5px] border-border rounded-[10px] resize-none min-h-[110px] transition-colors duration-200 outline-none focus:border-border-focus focus:bg-white placeholder:text-text-muted"
+          className="w-full p-3 font-sans text-[13px] leading-relaxed text-text-primary bg-bg-primary border-[1.5px] border-border rounded-[10px] resize-none min-h-[110px] transition-colors duration-200 outline-none focus:border-border-focus focus:bg-white placeholder:text-text-muted dark:bg-dark-bg-primary dark:text-dark-text-primary dark:border-dark-border dark:focus:border-dark-border-focus dark:focus:bg-dark-bg-surface dark:placeholder:text-dark-text-muted"
           placeholder="Describe tu idea de tesis aquí..."
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
           disabled={isGenerating}
         />
-        <p className="text-[11px] text-text-muted leading-relaxed">
+        <p className="text-[11px] text-text-muted leading-relaxed dark:text-dark-text-muted">
           Se analizará tu historial académico y CV para evaluar el alineamiento.
         </p>
       </div>
@@ -78,7 +78,7 @@ export function AlignmentSidebar({
       <button
         onClick={handleGenerate}
         disabled={!idea.trim() || isGenerating}
-        className="w-full p-3 bg-accent text-white border-none rounded-[10px] font-sans text-[14px] font-medium cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mb-7"
+        className="w-full p-3 bg-accent text-white border-none rounded-[10px] font-sans text-[14px] font-medium cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mb-7 dark:bg-dark-accent dark:hover:bg-dark-accent-hover"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
           <circle cx="11" cy="11" r="8" />
@@ -87,25 +87,25 @@ export function AlignmentSidebar({
         Generar Reporte
       </button>
 
-      <div className="h-[1px] bg-border my-0 mb-6 shrink-0" />
+      <div className="h-[1px] bg-border my-0 mb-6 shrink-0 dark:bg-dark-border" />
       
-      <p className="text-[10px] font-semibold tracking-[0.1em] uppercase text-text-muted mb-3">
+      <p className="text-[10px] font-semibold tracking-[0.1em] uppercase text-text-muted mb-3 dark:text-dark-text-muted">
         Historial de reportes
       </p>
 
       <div className="flex flex-col gap-[2px] flex-1 overflow-y-auto min-h-0 pr-1 -mr-1">
         {reports.length === 0 ? (
-          <p className="text-[12px] text-text-muted text-center py-4">No hay reportes aún.</p>
+          <p className="text-[12px] text-text-muted text-center py-4 dark:text-dark-text-muted">No hay reportes aún.</p>
         ) : (
           reports.map(report => (
             <div
               key={report.id}
               onClick={() => onSelectReport(report.id)}
               className={`p-[0.65rem] px-3 rounded-lg cursor-pointer transition-colors duration-150 flex flex-col gap-[3px] ${
-                activeReportId === report.id ? 'bg-accent-soft' : 'hover:bg-bg-hover'
+                activeReportId === report.id ? 'bg-accent-soft dark:bg-dark-accent-soft' : 'hover:bg-bg-hover dark:hover:bg-dark-bg-hover'
               }`}
             >
-              <div className="text-[10px] text-text-muted flex items-center gap-1">
+              <div className="text-[10px] text-text-muted flex items-center gap-1 dark:text-dark-text-muted">
                 <span>{getTimeAgo(report.created_at)}</span>
                 <span className="mx-[2px]">·</span>
                 <span>{formatDate(report.created_at)}</span>
@@ -113,7 +113,7 @@ export function AlignmentSidebar({
                   {report.alignment_level}
                 </span>
               </div>
-              <div className="text-[12.5px] text-text-primary whitespace-nowrap overflow-hidden text-ellipsis leading-[1.3]">
+              <div className="text-[12.5px] text-text-primary whitespace-nowrap overflow-hidden text-ellipsis leading-[1.3] dark:text-dark-text-primary">
                 {report.thesis_idea}
               </div>
             </div>

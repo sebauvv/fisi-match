@@ -63,7 +63,7 @@ export default function AlignmentEvaluatorPage() {
   const activeReport = reports.find(r => r.id === activeReportId);
 
   return (
-    <div className="flex h-[calc(100vh-120px)] overflow-hidden bg-bg-primary text-text-primary font-sans border border-border rounded-xl">
+    <div className="flex h-[calc(100vh-120px)] overflow-hidden bg-bg-primary text-text-primary font-sans border border-border rounded-xl dark:bg-dark-bg-primary dark:text-dark-text-primary dark:border-dark-border">
       <AlignmentSidebar
         reports={reports}
         activeReportId={activeReportId}
@@ -75,7 +75,7 @@ export default function AlignmentEvaluatorPage() {
       
       <main className="flex-1 overflow-y-auto p-8 relative">
         {error && (
-          <div className="bg-error-soft text-error p-4 rounded-xl border border-[#EEC8C8] text-sm mb-6">
+          <div className="bg-error-soft text-error p-4 rounded-xl border border-[#EEC8C8] text-sm mb-6 dark:bg-dark-error-soft dark:text-dark-error dark:border-dark-error">
             {error}
           </div>
         )}
