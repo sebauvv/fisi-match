@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.routers import auth, students, profile, advisors, theses, publications, stats, metadata, recommendation, alignment
+from app.routers import auth, students, profile, advisors, theses, publications, stats, metadata, recommendation, alignment, alternative_recommendations
 
 settings = get_settings()
 
@@ -37,6 +37,7 @@ app.include_router(stats.router)
 app.include_router(metadata.router)
 app.include_router(recommendation.router)
 app.include_router(alignment.router)
+app.include_router(alternative_recommendations.router)
 
 
 @app.get("/health", tags=["health"])

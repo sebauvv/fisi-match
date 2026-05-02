@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     alignment_lambda_access_key_id: str = os.getenv("ALIGNMENT_LAMBDA_ACCESS_KEY_ID", "")
     alignment_lambda_secret_access_key: str = os.getenv("ALIGNMENT_LAMBDA_SECRET_ACCESS_KEY", "")
 
+    recommender_lambda_function: str = os.getenv("RECOMMENDER_LAMBDA_FUNCTION", "")
+    recommender_lambda_region: str = os.getenv("RECOMMENDER_LAMBDA_REGION", "us-east-2")
+    recommender_lambda_access_key_id: str = os.getenv("RECOMMENDER_LAMBDA_ACCESS_KEY_ID", "")
+    recommender_lambda_secret_access_key: str = os.getenv("RECOMMENDER_LAMBDA_SECRET_ACCESS_KEY", "")
+
     # PostgreSQL
     db_host: str = os.getenv("DB_HOST")
     db_port: str = os.getenv("DB_PORT")

@@ -77,6 +77,22 @@ def get_alignment_lambda_client():
     return boto3.client("lambda", region_name=settings.alignment_lambda_region)
 
 
+def get_recommender_lambda_client():
+    """
+    Crea cliente Lambda con credenciales IAM exclusivas para
+    el Alternative Recommender (Phase 7).
+    Utiliza RECOMMENDER_LAMBDA_ACCESS_KEY_ID / RECOMMENDER_LAMBDA_SECRET_ACCESS_KEY del .env.
+    """
+    if settings.recommender_lambda_access_key_id and settings.recommender_lambda_secret_access_key:
+        return boto3.client(
+            "lambda",
+            region_name=settings.recommender_lambda_region,
+            aws_access_key_id=settings.recommender_lambda_access_key_id,
+            aws_secret_access_key=settings.recommender_lambda_secret_access_key,
+        )
+    return boto3.client("lambda", region_name=settings.recommender_lambda_region)
+
+
 async def upload_to_s3(s3_client, file: UploadFile, prefix: str) -> str:
     """Sube un archivo a S3 y retorna la key generada."""
     content = await file.read()
