@@ -30,6 +30,15 @@ class Settings(BaseSettings):
     recommender_lambda_access_key_id: str = os.getenv("RECOMMENDER_LAMBDA_ACCESS_KEY_ID", "")
     recommender_lambda_secret_access_key: str = os.getenv("RECOMMENDER_LAMBDA_SECRET_ACCESS_KEY", "")
 
+    # Bedrock Embeddings (usadas por el backend para el kNN)
+    embedding_model: str = os.getenv("EMBEDDING_MODEL", "amazon.titan-embed-text-v2:0")
+    embedding_dimensions: int = int(os.getenv("EMBEDDING_DIMENSIONS", "1024"))
+
+    # Parámetros del motor de recomendación
+    top_k: int = int(os.getenv("TOP_K", "5"))
+    knn_limit: int = int(os.getenv("KNN_LIMIT", "50"))
+    recency_boost: float = float(os.getenv("RECENCY_BOOST", "0.3"))
+
     # PostgreSQL
     db_host: str = os.getenv("DB_HOST")
     db_port: str = os.getenv("DB_PORT")
