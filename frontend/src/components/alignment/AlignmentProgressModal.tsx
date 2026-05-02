@@ -52,8 +52,8 @@ export function AlignmentProgressModal({ isOpen }: AlignmentProgressModalProps) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#1e1e2e8c] z-[200] flex items-center justify-center backdrop-blur-[4px] dark:bg-[#0f1729b3]">
-      <div className="bg-bg-surface border border-border rounded-[20px] w-[420px] p-10 flex flex-col items-center gap-6 animate-[modalIn_0.3s_cubic-bezier(0.16,1,0.3,1)] dark:bg-dark-bg-surface dark:border-dark-border">
+    <div className="fixed inset-0 bg-[#1e1e2e8c] z-[200] flex items-center justify-center backdrop-blur-[4px] dark:bg-[#0f1729b3] p-4">
+      <div className="bg-bg-surface border border-border rounded-[20px] w-full max-w-[420px] p-6 sm:p-10 flex flex-col items-center gap-6 animate-[modalIn_0.3s_cubic-bezier(0.16,1,0.3,1)] dark:bg-dark-bg-surface dark:border-dark-border">
         <div className="relative w-[60px] h-[60px]">
           <svg viewBox="0 0 60 60" fill="none" className="w-[60px] h-[60px] animate-[spin_1.4s_linear_infinite]">
             <circle cx="30" cy="30" r="24" fill="none" className="stroke-bg-surface-alt dark:stroke-dark-bg-surface-alt" strokeWidth="5" />

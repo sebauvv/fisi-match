@@ -56,7 +56,7 @@ export function AlignmentSidebar({
   };
 
   return (
-    <aside className="bg-bg-surface border-r border-border flex flex-col p-6 pt-6 pb-6 gap-0 w-[300px] shrink-0 h-full overflow-hidden dark:bg-dark-bg-surface dark:border-dark-border">
+    <aside className="w-full md:w-80 flex flex-col border-r border-border bg-bg-surface dark:bg-dark-bg-surface h-full overflow-hidden shrink-0 p-6">
       <p className="text-[10px] font-semibold tracking-[0.1em] uppercase text-text-muted mb-3 dark:text-dark-text-muted">
         Nueva evaluación
       </p>
