@@ -1,4 +1,6 @@
 import { X, Search, BookOpen, FileText, Compass, ClipboardList, Lightbulb } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,11 +13,8 @@ const NAV_ITEMS = [
   { label: 'Explorador de Articulos Externos', icon: FileText, path: '#' },
   { label: 'Recomendacion de Asesor', icon: Compass, path: '/recomendacion-asesor' },
   { label: 'Reporte de Alineamiento', icon: ClipboardList, path: '/reporte-alineamiento' },
-  { label: 'Recomendacion de Temas Alternativos', icon: Lightbulb, path: '#' },
+  { label: 'Recomendacion de Temas Alternativos', icon: Lightbulb, path: '/temas-alternativos' },
 ];
-
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
