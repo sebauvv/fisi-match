@@ -15,3 +15,7 @@ class PublicationRead(BaseModel):
     journal: Optional[str] = None
     doi: Optional[str] = None
     external_url: Optional[str] = None
+
+class PublicationListResponse(BaseModel):
+    items: list[PublicationRead]
+    total: int

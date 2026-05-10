@@ -8,12 +8,12 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { label: 'Explorador de Profesores', icon: Search, path: '/explorador-profesores' },
-  { label: 'Explorador de Tesis', icon: BookOpen, path: '#' },
-  { label: 'Explorador de Articulos Externos', icon: FileText, path: '#' },
-  { label: 'Recomendacion de Asesor', icon: Compass, path: '/recomendacion-asesor' },
-  { label: 'Reporte de Alineamiento', icon: ClipboardList, path: '/reporte-alineamiento' },
-  { label: 'Recomendacion de Temas Alternativos', icon: Lightbulb, path: '/temas-alternativos' },
+    { label: 'Explorador de Profesores', icon: Search, path: '/explorador-profesores' },
+    { label: 'Explorador de Tesis', icon: BookOpen, path: '/explorador-tesis' },
+    { label: 'Explorador de Artículos Externos', icon: FileText, path: '/explorador-articulos' },
+    { label: 'Recomendacion de Asesor', icon: Compass, path: '/recomendacion-asesor' },
+    { label: 'Reporte de Alineamiento', icon: ClipboardList, path: '/reporte-alineamiento' },
+    { label: 'Recomendacion de Temas Alternativos', icon: Lightbulb, path: '/temas-alternativos' },
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {

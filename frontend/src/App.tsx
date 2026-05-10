@@ -10,6 +10,8 @@ import AdvisorRecommendationPage from './pages/AdvisorRecommendationPage';
 import AlignmentEvaluatorPage from './pages/AlignmentEvaluatorPage';
 import AlternativeRecommenderPage from './pages/AlternativeRecommenderPage';
 import ProfilePage from './pages/ProfilePage';
+import ThesisExplorerPage from './pages/ThesisExplorerPage';
+import PublicationExplorerPage from './pages/PublicationExplorerPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -40,6 +42,8 @@ export default function App() {
           <Route path="/reporte-alineamiento" element={<AlignmentEvaluatorPage />} />
           <Route path="/temas-alternativos" element={<AlternativeRecommenderPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/explorador-tesis" element={<ThesisExplorerPage />} />
+          <Route path="/explorador-articulos" element={<PublicationExplorerPage />} />
         </Route>
 
         {/* Default redirect */}
