@@ -4,11 +4,22 @@ Servicio de recomendación de asesores para el backend FastAPI.
 Implementa las tres etapas previas a la explicación RAG:
   1. embed_idea()            — embedding via Bedrock Titan v2
   2. search_similar_chunks() — kNN cosine search en pgvector
-  3. rank_advisors()         — scoring temporal y ranking por asesor
+  3. rank_advisors()         — scoring temporal + content-type + cobertura
 
+Motor de scoring v2:
+  chunk_score = cosine_sim × temporal_weight(year) × content_type_weight(type)
+  advisor_score = mean(top_M_chunk_scores) × coverage_boost(num_relevant)
+
+Cambios vs v1:
+  - Content-type boosting: thesis > publication > profile
+  - Decaimiento temporal exponencial (últimos 5 años pesan significativamente más)
+  - Filtro de similitud mínima (MIN_SIMILARITY) para descartar ruido
+  - Coverage boost: asesores con más evidencia relevante reciben un bonus logarítmico
+  - kNN expandido por defecto (200 → mejor cobertura de asesores)
 """
 
 import json
+import math
 from collections import defaultdict
 from typing import Any
 
@@ -21,14 +32,29 @@ from app.config import get_settings
 
 settings = get_settings()
 
-# Parámetros de scoring
-RECENCY_BOOST = settings.recency_boost
-CHUNKS_PER_ADVISOR = 10
+# ── Parámetros de scoring ────────────────────────────────────────────────────
+
+RECENCY_BOOST = settings.recency_boost      # max boost para publicaciones recientes
+CHUNKS_PER_ADVISOR = 10                      # top-M chunks por asesor para promediar
 MIN_YEAR = 1997
 MAX_YEAR = 2026
+TEMPORAL_DECAY_RATE = 5.0                    # años de vida media del decaimiento exponencial
+
+# Peso por tipo de contenido: evidencia directa > indirecta > genérica
+CONTENT_TYPE_WEIGHTS = {
+    "thesis":      1.30,   # Evidencia directa: dirigió una tesis sobre el tema
+    "publication": 1.15,   # Evidencia indirecta: publicó sobre el tema
+    "profile":     1.00,   # Señal débil: su perfil menciona el área
+}
+
+# Similitud mínima para considerar un chunk relevante
+MIN_SIMILARITY = 0.30
+
+# Factor de boost por cobertura (cuántos chunks relevantes tiene el asesor)
+COVERAGE_ALPHA = 0.10
 
 
-# 1. Embedding
+# ── 1. Embedding ─────────────────────────────────────────────────────────────
 
 def _get_bedrock_client():
     """
@@ -82,7 +108,7 @@ def embed_idea(text: str) -> list[float]:
     return body["embedding"]
 
 
-# 2. kNN Search en pgvector
+# ── 2. kNN Search en pgvector ────────────────────────────────────────────────
 
 def _get_db_connection():
     """
@@ -106,7 +132,7 @@ def _get_db_connection():
 
 def search_similar_chunks(
     query_embedding: list[float],
-    limit: int = 50,
+    limit: int = 200,
 ) -> list[dict[str, Any]]:
     """
     Busca los chunks más similares al embedding de la consulta en pgvector.
@@ -117,9 +143,12 @@ def search_similar_chunks(
     Se usa ef_search=200 para garantizar recall consistente con el índice HNSW
     (el default de 40 produce variaciones en el borde de knn_limit).
 
+    Se amplía el límite por defecto a 200 (vs 50 original) para capturar
+    más asesores relevantes que podrían quedar fuera en un retrieval estrecho.
+
     Args:
         query_embedding: vector de 1024 dimensiones (salida de embed_idea)
-        limit: cantidad máxima de chunks a retornar
+        limit: cantidad máxima de chunks a retornar (default: 200)
 
     Returns:
         lista de dicts listos para pasar a rank_advisors()
@@ -159,27 +188,64 @@ def search_similar_chunks(
         conn.close()
 
 
-# 3. Scoring y Ranking
+# ── 3. Scoring y Ranking (v2) ────────────────────────────────────────────────
 
 def _temporal_weight(year) -> float:
     """
-    Calcula el peso temporal de un chunk.
+    Calcula el peso temporal de un chunk usando decaimiento exponencial.
 
-    Publicaciones recientes reciben un boost proporcional;
-    chunks sin año (perfiles) no reciben penalización (piso 1.0).
+    A diferencia del boost lineal original (diferencia mínima entre 2020 y 2026),
+    el decaimiento exponencial con DECAY_RATE=5 produce:
+      - 2026: +0.30 (boost máximo)
+      - 2021: +0.16
+      - 2016: +0.04
+      - 2010: +0.01
+      - 1997: ~+0.00
+
+    Chunks sin año (perfiles) no reciben penalización (piso 1.0).
     """
     if year is None:
         return 1.0
-    normalized = (year - MIN_YEAR) / max(MAX_YEAR - MIN_YEAR, 1)
-    normalized = max(0.0, min(1.0, normalized))
-    return 1.0 + RECENCY_BOOST * normalized
+    age = max(MAX_YEAR - year, 0)
+    return 1.0 + RECENCY_BOOST * math.exp(-age / TEMPORAL_DECAY_RATE)
+
+
+def _content_type_weight(content_type: str) -> float:
+    """
+    Retorna el peso multiplicativo según el tipo de contenido.
+
+    thesis (1.3) > publication (1.15) > profile (1.0)
+    """
+    return CONTENT_TYPE_WEIGHTS.get(content_type, 1.0)
 
 
 def _score_chunk(chunk: dict) -> float:
-    """Aplica la fórmula de scoring a un chunk individual."""
+    """
+    Aplica la fórmula de scoring v2 a un chunk individual.
+
+    chunk_score = cosine_sim × temporal_weight(year) × content_type_weight(type)
+    """
     sim = float(chunk["similarity"])
-    weight = _temporal_weight(chunk.get("year"))
-    return sim * weight
+    t_weight = _temporal_weight(chunk.get("year"))
+    ct_weight = _content_type_weight(chunk.get("content_type", "profile"))
+    return sim * t_weight * ct_weight
+
+
+def _coverage_boost(num_relevant_chunks: int) -> float:
+    """
+    Calcula un boost multiplicativo basado en la cantidad de evidencia relevante.
+
+    Fórmula: 1 + α × log(n + 1)
+
+    Con α=0.10:
+      - 1 chunk:  ×1.07
+      - 3 chunks: ×1.14
+      - 10 chunks: ×1.24
+      - 20 chunks: ×1.30
+
+    Recompensa asesores con evidencia diversa sin que el volumen domine.
+    """
+    return 1.0 + COVERAGE_ALPHA * math.log(num_relevant_chunks + 1)
 
 
 def rank_advisors(
@@ -191,11 +257,15 @@ def rank_advisors(
     Agrupa chunks por asesor, calcula el score de cada uno y retorna
     los top-K asesores ordenados por score.
 
-    Fórmula:
-        chunk_score = cosine_sim * temporal_weight(year)
-        advisor_score = mean(top_M_chunk_scores)  [M = chunks_per_advisor]
+    Fórmula v2:
+        chunk_score = cosine_sim × temporal_weight(year) × content_type_weight(type)
+        advisor_score = mean(top_M_chunk_scores) × coverage_boost(num_relevant)
 
-    Esto evita que asesores con muchas publicaciones tengan ventaja por volumen.
+    Mejoras vs v1:
+        - Filtra chunks por debajo de MIN_SIMILARITY (descarta ruido)
+        - Pondera por tipo de contenido (thesis > publication > profile)
+        - Decaimiento temporal exponencial (últimos 5 años pesan más)
+        - Coverage boost logarítmico (más evidencia = más confianza)
 
     Args:
         chunks: resultado de search_similar_chunks()
@@ -205,8 +275,13 @@ def rank_advisors(
     Returns:
         lista de dicts ordenada: advisor_id, advisor_name, score, evidence, ...
     """
+    # Filtrar chunks por debajo del umbral de similitud
+    relevant_chunks = [
+        c for c in chunks if float(c["similarity"]) >= MIN_SIMILARITY
+    ]
+
     by_advisor = defaultdict(list)
-    for chunk in chunks:
+    for chunk in relevant_chunks:
         scored = {**chunk, "chunk_score": _score_chunk(chunk)}
         by_advisor[chunk["advisor_id"]].append(scored)
 
@@ -216,6 +291,9 @@ def rank_advisors(
         top_chunks = sorted_chunks[:chunks_per_advisor]
 
         avg_score = sum(c["chunk_score"] for c in top_chunks) / len(top_chunks)
+
+        # Coverage boost: más chunks relevantes → más confianza en la recomendación
+        boosted_score = avg_score * _coverage_boost(len(advisor_chunks))
 
         evidence = [
             {
@@ -234,7 +312,7 @@ def rank_advisors(
             "advisor_name": advisor_chunks[0].get("advisor_name", ""),
             "orcid": advisor_chunks[0].get("orcid"),
             "thesis_count": advisor_chunks[0].get("thesis_count"),
-            "score": round(avg_score, 4),
+            "score": round(boosted_score, 4),
             "num_matching_chunks": len(advisor_chunks),
             "evidence": evidence,
         })

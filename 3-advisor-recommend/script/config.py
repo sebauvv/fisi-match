@@ -33,8 +33,22 @@ LLM_MODEL = os.getenv("LLM_MODEL", "us.amazon.nova-lite-v1:0")
 TOP_K = int(os.getenv("TOP_K", "5"))
 RECENCY_BOOST = float(os.getenv("RECENCY_BOOST", "0.3"))
 CHUNKS_PER_ADVISOR = int(os.getenv("CHUNKS_PER_ADVISOR", "10"))
-KNN_LIMIT = int(os.getenv("KNN_LIMIT", "50"))
+KNN_LIMIT = int(os.getenv("KNN_LIMIT", "200"))
 
-# rango temporal (se ajusta con los datos reales en runtime)
+# rango temporal
 MIN_YEAR = 1997
 MAX_YEAR = 2026
+TEMPORAL_DECAY_RATE = float(os.getenv("TEMPORAL_DECAY_RATE", "5.0"))
+
+# pesos por tipo de contenido (scoring v2)
+CONTENT_TYPE_WEIGHTS = {
+    "thesis":      1.30,
+    "publication": 1.15,
+    "profile":     1.00,
+}
+
+# similitud minima para considerar un chunk relevante
+MIN_SIMILARITY = float(os.getenv("MIN_SIMILARITY", "0.30"))
+
+# factor de boost por cobertura
+COVERAGE_ALPHA = float(os.getenv("COVERAGE_ALPHA", "0.10"))
