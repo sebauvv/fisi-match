@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { jsPDF } from 'jspdf';
 import type { AlternativeRecommendationResponse } from '../../types/alternative';
 import type { AlignmentReport } from '../../types/alignment';
 
@@ -8,6 +9,270 @@ interface Props {
 }
 
 export function AlternativeReportDetails({ data, report }: Props) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportPDF = () => {
+    setIsExporting(true);
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentW = pageW - margin * 2;
+      let y = margin;
+
+      const checkPageBreak = (needed: number) => {
+        if (y + needed > pageH - margin) {
+          pdf.addPage();
+          y = margin;
+        }
+      };
+
+      const addWrappedText = (text: string, x: number, startY: number, maxWidth: number, lineHeight: number): number => {
+        const lines = pdf.splitTextToSize(text, maxWidth);
+        lines.forEach((line: string) => {
+          checkPageBreak(lineHeight);
+          pdf.text(line, x, startY);
+          startY += lineHeight;
+          y = startY;
+        });
+        return startY;
+      };
+
+      // ── Encabezado ────────────────────────────────────────────
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(30, 30, 30);
+      pdf.text('Recomendación de Temas Alternativos', margin, y);
+      y += 7;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(120, 120, 120);
+      const fechaGeneracion = new Date().toLocaleDateString('es-PE', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      });
+      pdf.text(`Generado el ${fechaGeneracion}`, margin, y);
+      y += 5;
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(margin, y, pageW - margin, y);
+      y += 9;
+
+      // ── Idea de tesis ─────────────────────────────────────────
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(60, 60, 60);
+      checkPageBreak(8);
+      pdf.text('IDEA ANALIZADA', margin, y);
+      y += 5;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'italic');
+      pdf.setTextColor(80, 80, 80);
+      y = addWrappedText(`"${report.thesis_idea}"`, margin + 3, y, contentW - 3, 5);
+      y += 4;
+
+      // ── Score ─────────────────────────────────────────────────
+      checkPageBreak(14);
+      pdf.setFontSize(26);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(5, 150, 105);
+      pdf.text(`${report.score_pct}%`, margin, y);
+      const scoreTextW = pdf.getStringUnitWidth(`${report.score_pct}%`) * 26 / pdf.internal.scaleFactor;
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(120, 120, 120);
+      pdf.text('Alineación con el tema', margin + scoreTextW + 3, y - 1);
+      y += 7;
+
+      // ── Resumen ────────────────────────────────────────────────
+      checkPageBreak(8);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(60, 60, 60);
+      pdf.text('RESUMEN', margin, y);
+      y += 5;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(80, 80, 80);
+      y = addWrappedText(data.summary, margin, y, contentW, 5);
+      y += 6;
+
+      // ── Habilidades Faltantes ──────────────────────────────────
+      if (data.skill_gaps_to_close.length > 0) {
+        checkPageBreak(10);
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(30, 30, 30);
+        pdf.text('HABILIDADES FALTANTES', margin, y);
+        y += 2;
+        pdf.setDrawColor(217, 119, 6);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, y, margin + 60, y);
+        pdf.setLineWidth(0.2);
+        y += 6;
+
+        data.skill_gaps_to_close.forEach((gap, idx) => {
+          checkPageBreak(16);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(30, 30, 30);
+          pdf.text(`${idx + 1}. ${gap.skill}`, margin, y);
+          y += 5;
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(80, 80, 80);
+          y = addWrappedText(gap.resource, margin + 4, y, contentW - 4, 4.5);
+
+          pdf.setFontSize(8);
+          pdf.setTextColor(37, 99, 235);
+          checkPageBreak(6);
+          pdf.text(`Tiempo estimado: ${gap.estimated_time}`, margin + 4, y);
+          y += 7;
+        });
+        y += 2;
+      }
+
+      // ── Cursos Recomendados ────────────────────────────────────
+      if (data.recommended_courses.length > 0) {
+        checkPageBreak(10);
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(30, 30, 30);
+        pdf.text('CURSOS RECOMENDADOS', margin, y);
+        y += 2;
+        pdf.setDrawColor(37, 99, 235);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, y, margin + 60, y);
+        pdf.setLineWidth(0.2);
+        y += 6;
+
+        data.recommended_courses.forEach((course, idx) => {
+          checkPageBreak(16);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(30, 30, 30);
+          pdf.text(`${idx + 1}. ${course.name}`, margin, y);
+          y += 4.5;
+
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(37, 99, 235);
+          checkPageBreak(5);
+          pdf.text(course.platform, margin + 4, y);
+          y += 4.5;
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(80, 80, 80);
+          pdf.setFontSize(9);
+          y = addWrappedText(course.reason, margin + 4, y, contentW - 4, 4.5);
+          y += 4;
+        });
+        y += 2;
+      }
+
+      // ── Proyectos Prácticos ────────────────────────────────────
+      if (data.mini_projects.length > 0) {
+        checkPageBreak(10);
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(30, 30, 30);
+        pdf.text('PROYECTOS PRÁCTICOS', margin, y);
+        y += 2;
+        pdf.setDrawColor(5, 150, 105);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, y, margin + 60, y);
+        pdf.setLineWidth(0.2);
+        y += 6;
+
+        data.mini_projects.forEach((project, idx) => {
+          checkPageBreak(16);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(30, 30, 30);
+          pdf.text(`${idx + 1}. ${project.title}`, margin, y);
+          y += 5;
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(80, 80, 80);
+          y = addWrappedText(project.description, margin + 4, y, contentW - 4, 4.5);
+          y += 2;
+
+          if (project.skills_covered.length > 0) {
+            pdf.setFontSize(8);
+            pdf.setTextColor(100, 100, 100);
+            checkPageBreak(5);
+            const skillsLine = `Skills: ${project.skills_covered.join(' · ')}`;
+            y = addWrappedText(skillsLine, margin + 4, y, contentW - 4, 4.5);
+          }
+          y += 4;
+        });
+        y += 2;
+      }
+
+      // ── Temas Alternativos ─────────────────────────────────────
+      if (data.alternative_topics.length > 0) {
+        checkPageBreak(10);
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(30, 30, 30);
+        pdf.text('TEMAS ALTERNATIVOS SUGERIDOS', margin, y);
+        y += 2;
+        pdf.setDrawColor(99, 102, 241);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, y, margin + 75, y);
+        pdf.setLineWidth(0.2);
+        y += 6;
+
+        data.alternative_topics.forEach((topic, idx) => {
+          checkPageBreak(20);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(30, 30, 30);
+          pdf.text(`Opción ${String(idx + 1).padStart(2, '0')} · ${topic.title}`, margin, y);
+          y += 5;
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(80, 80, 80);
+          y = addWrappedText(topic.justification, margin + 4, y, contentW - 4, 4.5);
+          y += 2;
+
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(37, 99, 235);
+          checkPageBreak(5);
+          pdf.text('Diferencia con tu tema actual:', margin + 4, y);
+          y += 4.5;
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(80, 80, 80);
+          y = addWrappedText(topic.delta_from_current, margin + 4, y, contentW - 4, 4.5);
+          y += 6;
+        });
+      }
+
+      // ── Pie de página en todas las páginas ────────────────────
+      const totalPages = (pdf.internal as any).getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(7);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(180, 180, 180);
+        pdf.text('FisiMatch · Recomendación de Temas Alternativos', margin, pageH - 8);
+        pdf.text(`Página ${i} de ${totalPages}`, pageW - margin, pageH - 8, { align: 'right' });
+      }
+
+      const filename = `recomendacion-alternativa-${new Date().toISOString().slice(0, 10)}.pdf`;
+      pdf.save(filename);
+    } catch (err) {
+      console.error('Error generando PDF:', err);
+      alert('Ocurrió un error al generar el PDF. Inténtalo de nuevo.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-8 bg-slate-50/30 dark:bg-slate-900/30 w-full animate-in fade-in duration-300">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -21,9 +286,33 @@ export function AlternativeReportDetails({ data, report }: Props) {
               Análisis detallado de brechas, recursos recomendados y temas alternativos para tu perfil.
             </p>
           </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
-            Generado · {new Date().toLocaleDateString()}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+              Generado · {new Date().toLocaleDateString()}
+            </span>
+            <button
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold hover:bg-slate-700 dark:hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shrink-0"
+            >
+              {isExporting ? (
+                <>
+                  <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  Generando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 1v9M4 7l4 4 4-4M2 13h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Descargar PDF
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Summary Card */}
