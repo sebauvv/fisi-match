@@ -12,6 +12,7 @@ import AlternativeRecommenderPage from './pages/AlternativeRecommenderPage';
 import ProfilePage from './pages/ProfilePage';
 import ThesisExplorerPage from './pages/ThesisExplorerPage';
 import PublicationExplorerPage from './pages/PublicationExplorerPage';
+import ProfilePage from './pages/ProfilePage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -44,6 +45,7 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/explorador-tesis" element={<ThesisExplorerPage />} />
           <Route path="/explorador-articulos" element={<PublicationExplorerPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
         {/* Default redirect */}
