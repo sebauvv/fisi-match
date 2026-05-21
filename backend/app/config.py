@@ -8,7 +8,7 @@ load_dotenv()
 class Settings(BaseSettings):
     # AWS
     aws_region: str = os.getenv("AWS_REGION")
-    aws_profile: str = os.getenv("AWS_PROFILE")
+    aws_profile: str = os.getenv("AWS_PROFILE", "")
     s3_bucket: str = os.getenv("S3_BUCKET")
     s3_access_key_id: str = os.getenv("S3_ACCESS_KEY_ID")
     s3_secret_access_key: str = os.getenv("S3_SECRET_ACCESS_KEY")

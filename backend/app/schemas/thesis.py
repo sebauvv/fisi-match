@@ -28,3 +28,7 @@ class ThesisRead(ThesisListItem):
     handle_url: Optional[str] = None
     language: Optional[str] = None
     jurors: Optional[list[str]] = None
+
+class ThesisListResponse(BaseModel):
+    items: list[ThesisListItem]
+    total: int
