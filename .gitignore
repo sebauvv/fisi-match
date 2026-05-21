@@ -2,3 +2,18 @@ requisitos.pdf
 response1.json
 response2.json
 xd.json
+
+# Entorno virtual
+venv/
+env/
+
+# Variables de entorno (¡NUNCA subas contraseñas o credenciales!)
+.env
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+
+# Archivos de logs y bases de datos locales (opcional, dependiendo tu BD)
+*.sqlite3
+*.log

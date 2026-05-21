@@ -6,6 +6,7 @@
 
 @theme {
 	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+	--font-serif: 'DM Serif Display', Georgia, serif;
 
 	/* Light palette */
 	--color-bg-primary: #F5F2EC;
@@ -21,8 +22,11 @@
 	--color-accent-hover: #3D5A66;
 	--color-accent-soft: #E6EEF1;
 	--color-success: #3D8B5E;
+	--color-success-soft: #E8F5EE;
 	--color-error: #C44545;
+	--color-error-soft: #FBEAEA;
 	--color-warning: #C4893D;
+	--color-warning-soft: #FDF3E7;
 
 	/* Dark palette */
 	--color-dark-bg-primary: #0F1729;
@@ -38,8 +42,11 @@
 	--color-dark-accent-hover: #4A7CE0;
 	--color-dark-accent-soft: #1A2D4D;
 	--color-dark-success: #4ADE80;
+	--color-dark-success-soft: #1A3B2A;
 	--color-dark-error: #F87171;
+	--color-dark-error-soft: #4A1A1A;
 	--color-dark-warning: #FBBF24;
+	--color-dark-warning-soft: #4D3B14;
 }
 
 /* Base resets */

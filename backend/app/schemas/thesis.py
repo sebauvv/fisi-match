@@ -13,6 +13,7 @@ class ThesisListItem(BaseModel):
     advisor_id: Optional[str] = None
     degree_level: Optional[str] = None
     degree_name: Optional[str] = None
+    handle_url: Optional[str] = None
 
 
 class ThesisRead(ThesisListItem):
@@ -27,3 +28,7 @@ class ThesisRead(ThesisListItem):
     handle_url: Optional[str] = None
     language: Optional[str] = None
     jurors: Optional[list[str]] = None
+
+class ThesisListResponse(BaseModel):
+    items: list[ThesisListItem]
+    total: int

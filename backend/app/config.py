@@ -8,7 +8,7 @@ load_dotenv()
 class Settings(BaseSettings):
     # AWS
     aws_region: str = os.getenv("AWS_REGION")
-    aws_profile: str = os.getenv("AWS_PROFILE")
+    aws_profile: str = os.getenv("AWS_PROFILE","")
     s3_bucket: str = os.getenv("S3_BUCKET")
     s3_access_key_id: str = os.getenv("S3_ACCESS_KEY_ID")
     s3_secret_access_key: str = os.getenv("S3_SECRET_ACCESS_KEY")
@@ -19,6 +19,25 @@ class Settings(BaseSettings):
     advisor_lambda_access_key_id: str = os.getenv("ADVISOR_LAMBDA_ACCESS_KEY_ID", "")
     advisor_lambda_secret_access_key: str = os.getenv("ADVISOR_LAMBDA_SECRET_ACCESS_KEY", "")
     advisor_lambda_region: str = os.getenv("ADVISOR_LAMBDA_REGION", "us-east-2")
+
+    alignment_lambda_function: str = os.getenv("ALIGNMENT_LAMBDA_FUNCTION", "")
+    alignment_lambda_region: str = os.getenv("ALIGNMENT_LAMBDA_REGION", "us-east-2")
+    alignment_lambda_access_key_id: str = os.getenv("ALIGNMENT_LAMBDA_ACCESS_KEY_ID", "")
+    alignment_lambda_secret_access_key: str = os.getenv("ALIGNMENT_LAMBDA_SECRET_ACCESS_KEY", "")
+
+    recommender_lambda_function: str = os.getenv("RECOMMENDER_LAMBDA_FUNCTION", "")
+    recommender_lambda_region: str = os.getenv("RECOMMENDER_LAMBDA_REGION", "us-east-2")
+    recommender_lambda_access_key_id: str = os.getenv("RECOMMENDER_LAMBDA_ACCESS_KEY_ID", "")
+    recommender_lambda_secret_access_key: str = os.getenv("RECOMMENDER_LAMBDA_SECRET_ACCESS_KEY", "")
+
+    # Bedrock Embeddings (usadas por el backend para el kNN)
+    embedding_model: str = os.getenv("EMBEDDING_MODEL", "amazon.titan-embed-text-v2:0")
+    embedding_dimensions: int = int(os.getenv("EMBEDDING_DIMENSIONS", "1024"))
+
+    # Parámetros del motor de recomendación
+    top_k: int = int(os.getenv("TOP_K", "5"))
+    knn_limit: int = int(os.getenv("KNN_LIMIT", "200"))
+    recency_boost: float = float(os.getenv("RECENCY_BOOST", "0.3"))
 
     # PostgreSQL
     db_host: str = os.getenv("DB_HOST")

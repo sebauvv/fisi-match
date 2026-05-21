@@ -254,14 +254,15 @@ const AdvisorProfilePage: React.FC = () => {
 											href={pub.external_url || '#'}
 											target={pub.external_url ? "_blank" : "_self"}
 											rel="noopener noreferrer"
-											className="block bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 hover:border-accent/40 hover:-translate-y-1 hover:shadow-lg transition-all relative overflow-hidden group"
+											className={`block bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 hover:border-accent/40 hover:-translate-y-1 hover:shadow-lg transition-all relative overflow-hidden group ${pub.external_url ? 'cursor-pointer' : 'cursor-default'}`}
 										>
 											<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 											<div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-3 border ${pType.colorClass}`}>
 												{pType.label}
 											</div>
-											<h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary leading-snug mb-3">
-												{pub.title}
+											<h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary leading-snug mb-3 flex items-start justify-between gap-2">
+												<span>{pub.title}</span>
+												{pub.external_url && <LinkIcon size={14} className="text-text-muted shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />}
 											</h4>
 											<div className="text-xs text-text-muted flex items-center justify-between">
 												<span>{pub.year || 'Año N/A'} {pub.journal ? `· ${pub.journal}` : ''}</span>
@@ -292,18 +293,25 @@ const AdvisorProfilePage: React.FC = () => {
 						) : (
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 								{theses.map(thesis => (
-									<div key={thesis.id} className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 hover:border-red-400/40 hover:-translate-y-1 hover:shadow-lg transition-all relative overflow-hidden group cursor-default">
+									<a 
+										key={thesis.id} 
+										href={thesis.handle_url || '#'}
+										target={thesis.handle_url ? "_blank" : "_self"}
+										rel="noopener noreferrer"
+										className={`block bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 hover:border-red-400/40 hover:-translate-y-1 hover:shadow-lg transition-all relative overflow-hidden group ${thesis.handle_url ? 'cursor-pointer' : 'cursor-default'}`}
+									>
 										<div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-red-400 to-purple-500 rounded-l-xl"></div>
 										<div className="text-[10px] font-bold uppercase tracking-wider text-red-400 mb-2 opacity-80">
 											{thesis.author} · {thesis.year}
 										</div>
-										<h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary leading-snug mb-3">
-											{thesis.title}
+										<h4 className="text-sm font-medium text-text-primary dark:text-dark-text-primary leading-snug mb-3 flex items-start justify-between gap-2">
+											<span>{thesis.title}</span>
+											{thesis.handle_url && <LinkIcon size={14} className="text-text-muted shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />}
 										</h4>
 										<div className="text-xs text-text-muted mt-auto pt-2 border-t border-border dark:border-dark-border">
 											{thesis.degree_name || 'Grado no especificado'}
 										</div>
-									</div>
+									</a>
 								))}
 							</div>
 						)}

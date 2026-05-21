@@ -204,6 +204,7 @@ CREATE TABLE IF NOT EXISTS alignment_reports (
   topic_requirements  TEXT,
   student_profile_summary TEXT,
   justification       TEXT NOT NULL,
+  skill_bars          TEXT,
   student_strengths   TEXT,
   skill_gaps          TEXT,
   -- Respuesta JSON completa del LLM (para uso futuro y la api)
