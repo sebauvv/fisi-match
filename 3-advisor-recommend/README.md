@@ -32,34 +32,44 @@ POST /recommendations (FastAPI backend)
 
 **Motivación**: Esta separación permite que un desarrollador trabaje únicamente desde `backend/` sin necesitar credenciales AWS propias ni acceso a la cuenta de producción. El Lambda solo necesita permisos de Bedrock para el LLM.
 
-## Formula de scoring (ejecutada en el backend)
+## Formula de scoring v2 (ejecutada en el backend)
 
-La recomendación combina similitud semántica con peso temporal:
+La recomendación combina similitud semántica, peso temporal, tipo de contenido y cobertura:
 
 ```
-chunk_score(q, c) = cosine_sim(q, c) * temporal_weight(c.year)
+chunk_score(q, c) = cosine_sim(q, c) * temporal_weight(c.year) * content_type_weight(c.type)
 ```
 
-Peso temporal (boost lineal a publicaciones recientes):
+Peso temporal (decaimiento exponencial, DECAY_RATE=5):
 ```
-temporal_weight(year) = 1.0 + RECENCY_BOOST * ((year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR))
+temporal_weight(year) = 1.0 + RECENCY_BOOST * exp(-(MAX_YEAR - year) / DECAY_RATE)
 ```
 
-Con RECENCY_BOOST=0.3 y rango 1997-2026:
-- 2026: peso 1.30 (boost máximo, 30%)
-- 2020: peso 1.24
-- 2010: peso 1.13
-- 1997: peso 1.00 (sin boost, pero no penalizado)
+Con RECENCY_BOOST=0.3:
+- 2026: peso 1.30 (boost máximo)
+- 2021: peso 1.16
+- 2016: peso 1.04
+- 2010: peso 1.01
+- 1997: peso ~1.00
 - Sin año: peso 1.00 (chunks de perfil)
+
+Peso por tipo de contenido:
+- `thesis`: ×1.30 (evidencia directa: dirigió una tesis sobre el tema)
+- `publication`: ×1.15 (evidencia indirecta: publicó sobre el tema)
+- `profile`: ×1.00 (señal débil: perfil menciona el área)
 
 Score del asesor:
 ```
-advisor_score = mean(top_K_chunk_scores)
+advisor_score = mean(top_M_chunk_scores) * coverage_boost(num_relevant)
+coverage_boost(n) = 1 + 0.10 * log(n + 1)
 ```
 
-Se toman los mejores 10 chunks por asesor (CHUNKS_PER_ADVISOR) para evitar que asesores con alto volumen de publicaciones tengan ventaja por cantidad.
+Filtros:
+- Chunks con similitud < 0.30 son descartados (MIN_SIMILARITY)
+- Se toman los mejores 10 chunks por asesor (CHUNKS_PER_ADVISOR)
+- kNN recupera 200 chunks (vs 50 en v1) para mejor cobertura de asesores
 
-**Justificación**: La combinación lineal es interpretable y reproducible. El boost temporal no penaliza trabajos antiguos (piso 1.0) sino que premia actividad reciente. Esto favorece a asesores activos sin descartar a los de trayectoria larga.
+**Justificación**: El decaimiento exponencial diferencia mucho más los últimos 5 años vs el lineal original. El content-type weighting premia la evidencia directa (tesis dirigidas) sobre señales débiles (perfiles). El coverage boost da un bonus logarítmico a asesores con más evidencia relevante sin que dominen por volumen.
 
 ## Estructura
 
@@ -234,6 +244,45 @@ terraform output -raw backend_invoker_secret_access_key
 |---|---|---|
 | `--idea` | (requerido) | Idea de tesis del estudiante |
 | `--top-k` | 5 | Cantidad de asesores a recomendar |
-| `--knn-limit` | 50 | Chunks kNN a recuperar de pgvector |
+| `--knn-limit` | 200 | Chunks kNN a recuperar de pgvector |
 | `--no-explain` | false | Omite la generación de explicaciones RAG |
 | `--output` | text | Formato: `text` o `json` |
+
+## Evaluación offline (backend)
+
+El backend incluye un evaluador de calidad del motor que usa métricas intrínsecas (sin feedback de usuarios). Costo: ~$0.001 por ejecución.
+
+### Endpoints
+
+| Endpoint | Descripción |
+|---|---|
+| `POST /evaluate` | Evaluación completa: 25 queries + test de estabilidad |
+| `POST /evaluate/quick` | Evaluación rápida: 5 queries |
+| `POST /evaluate/compare` | Debug: ranking detallado de una query |
+
+### Métricas calculadas
+
+| Métrica | Qué mide |
+|---|---|
+| Score separation | Diferenciación entre top y resto |
+| Score gap top-2 | Confianza en el #1 recomendado |
+| Evidence coverage | Diversidad de tipos (thesis/pub/profile) |
+| Advisor diversity | Que los recomendados no sean del mismo nicho |
+| Ranking stability (τ) | Consistencia ante paráfrasis de la misma idea |
+
+### Ejemplo de uso
+
+```bash
+# Evaluación completa con detalle
+curl -X POST http://localhost:8000/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{"include_detail": true}'
+
+# Evaluación rápida
+curl -X POST http://localhost:8000/evaluate/quick
+
+# Debug de una query
+curl -X POST http://localhost:8000/evaluate/compare \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Sistema de NLP para clasificar documentos legales"}'
+```

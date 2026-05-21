@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     # Parámetros del motor de recomendación
     top_k: int = int(os.getenv("TOP_K", "5"))
-    knn_limit: int = int(os.getenv("KNN_LIMIT", "50"))
+    knn_limit: int = int(os.getenv("KNN_LIMIT", "200"))
     recency_boost: float = float(os.getenv("RECENCY_BOOST", "0.3"))
 
     # PostgreSQL

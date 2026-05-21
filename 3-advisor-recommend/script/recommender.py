@@ -1,47 +1,63 @@
 """
-Motor de scoring y ranking de asesores.
+Motor de scoring y ranking de asesores (v2).
 
-Implementa la formula de recomendacion:
+Formula de scoring:
+    chunk_score = cosine_sim * temporal_weight(year) * content_type_weight(type)
+    advisor_score = mean(top_M_chunk_scores) * coverage_boost(num_relevant)
 
-    chunk_score(q, c) = cosine_sim(q, c) * temporal_weight(c.year)
-
-    temporal_weight(year) = 1.0 + RECENCY_BOOST * ((year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR))
-        Si year es null, temporal_weight = 1.0
-
-    advisor_score = mean(top_K_chunk_scores)
-
-La combinacion lineal premia publicaciones recientes sin penalizar
-las antiguas (piso 1.0). RECENCY_BOOST = 0.3 otorga hasta 30% de ventaja
-al material mas actual.
+Mejoras vs v1:
+    - Content-type boosting: thesis (1.3) > publication (1.15) > profile (1.0)
+    - Decaimiento temporal exponencial (ultimos 5 años pesan mas)
+    - Filtro de similitud minima (MIN_SIMILARITY)
+    - Coverage boost logaritmico (mas evidencia = mas confianza)
 """
 
+import math
 from collections import defaultdict
-from config import RECENCY_BOOST, MIN_YEAR, MAX_YEAR, CHUNKS_PER_ADVISOR, TOP_K
+from config import (
+    RECENCY_BOOST, MIN_YEAR, MAX_YEAR, TEMPORAL_DECAY_RATE,
+    CHUNKS_PER_ADVISOR, TOP_K, CONTENT_TYPE_WEIGHTS,
+    MIN_SIMILARITY, COVERAGE_ALPHA,
+)
 
 
 def temporal_weight(year):
     """
-    Calcula el peso temporal de un chunk.
+    Calcula el peso temporal usando decaimiento exponencial.
 
-    Publicaciones recientes reciben un boost proporcional;
-    chunks sin año (perfiles) no reciben penalizacion.
+    Con DECAY_RATE=5:
+      2026: +0.30, 2021: +0.16, 2016: +0.04, 2010: +0.01
+    Chunks sin año (perfiles) retornan 1.0 (sin penalizacion).
     """
     if year is None:
         return 1.0
-    normalized = (year - MIN_YEAR) / max(MAX_YEAR - MIN_YEAR, 1)
-    normalized = max(0.0, min(1.0, normalized))
-    return 1.0 + RECENCY_BOOST * normalized
+    age = max(MAX_YEAR - year, 0)
+    return 1.0 + RECENCY_BOOST * math.exp(-age / TEMPORAL_DECAY_RATE)
+
+
+def content_type_weight(content_type):
+    """Retorna el peso multiplicativo segun el tipo de contenido."""
+    return CONTENT_TYPE_WEIGHTS.get(content_type, 1.0)
+
+
+def coverage_boost(num_relevant_chunks):
+    """
+    Boost multiplicativo por cantidad de evidencia relevante.
+    Formula: 1 + alpha * log(n + 1)
+    """
+    return 1.0 + COVERAGE_ALPHA * math.log(num_relevant_chunks + 1)
 
 
 def score_chunk(chunk):
     """
-    Aplica la formula de scoring a un chunk individual.
+    Aplica la formula de scoring v2 a un chunk individual.
 
-    chunk debe contener 'similarity' (float) y 'year' (int o None).
+    chunk_score = cosine_sim * temporal_weight(year) * content_type_weight(type)
     """
     sim = float(chunk["similarity"])
-    weight = temporal_weight(chunk.get("year"))
-    return sim * weight
+    t_weight = temporal_weight(chunk.get("year"))
+    ct_weight = content_type_weight(chunk.get("content_type", "profile"))
+    return sim * t_weight * ct_weight
 
 
 def rank_advisors(chunks, top_k=None, chunks_per_advisor=None):
@@ -49,9 +65,8 @@ def rank_advisors(chunks, top_k=None, chunks_per_advisor=None):
     Agrupa chunks por asesor, calcula el score de cada uno y retorna
     los top-K asesores ordenados por score.
 
-    Para cada asesor se toman los mejores M chunks (CHUNKS_PER_ADVISOR)
-    y se promedian sus scores ponderados. Esto evita que asesores con
-    muchas publicaciones tengan ventaja por volumen.
+    Filtra chunks por debajo de MIN_SIMILARITY, aplica scoring v2,
+    y agrega coverage boost logaritmico.
 
     Args:
         chunks: resultado de search_similar_chunks (lista de dicts)
@@ -66,22 +81,28 @@ def rank_advisors(chunks, top_k=None, chunks_per_advisor=None):
     if chunks_per_advisor is None:
         chunks_per_advisor = CHUNKS_PER_ADVISOR
 
+    # Filtra chunks por debajo del umbral de similitud
+    relevant_chunks = [
+        c for c in chunks if float(c["similarity"]) >= MIN_SIMILARITY
+    ]
+
     # Agrupa chunks por advisor_id
     by_advisor = defaultdict(list)
-    for chunk in chunks:
+    for chunk in relevant_chunks:
         scored = {
             **chunk,
             "chunk_score": score_chunk(chunk),
         }
         by_advisor[chunk["advisor_id"]].append(scored)
 
-    # Calcula score por asesor (promedio de top-M chunks)
+    # Calcula score por asesor (promedio de top-M chunks * coverage boost)
     advisor_scores = []
     for advisor_id, advisor_chunks in by_advisor.items():
         sorted_chunks = sorted(advisor_chunks, key=lambda c: c["chunk_score"], reverse=True)
         top_chunks = sorted_chunks[:chunks_per_advisor]
 
         avg_score = sum(c["chunk_score"] for c in top_chunks) / len(top_chunks)
+        boosted_score = avg_score * coverage_boost(len(advisor_chunks))
 
         evidence = []
         for c in top_chunks:
@@ -99,7 +120,7 @@ def rank_advisors(chunks, top_k=None, chunks_per_advisor=None):
             "advisor_name": advisor_chunks[0].get("advisor_name", ""),
             "orcid": advisor_chunks[0].get("orcid"),
             "thesis_count": advisor_chunks[0].get("thesis_count"),
-            "score": round(avg_score, 4),
+            "score": round(boosted_score, 4),
             "num_matching_chunks": len(advisor_chunks),
             "evidence": evidence,
         })
