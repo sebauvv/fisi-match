@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { jsPDF } from 'jspdf';
 import type { AlignmentReport } from '../../types/alignment';
 
 interface AlignmentReportDetailsProps {
@@ -5,6 +7,7 @@ interface AlignmentReportDetailsProps {
 }
 
 export function AlignmentReportDetails({ report }: AlignmentReportDetailsProps) {
+  const [isExporting, setIsExporting] = useState(false);
   const json = report.report_json;
 
   const formatDate = (dateString: string) => {
@@ -35,6 +38,202 @@ export function AlignmentReportDetails({ report }: AlignmentReportDetailsProps) 
 
   const levelText = report.alignment_level === 'Alta' ? 'Altamente Alineada' :
                     report.alignment_level === 'Media' ? 'Parcialmente Alineada' : 'Poco Alineada';
+
+  const handleExportPDF = () => {
+    setIsExporting(true);
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentW = pageW - margin * 2;
+      let y = margin;
+
+      const checkPageBreak = (needed: number) => {
+        if (y + needed > pageH - margin) {
+          pdf.addPage();
+          y = margin;
+        }
+      };
+
+      // ── Encabezado ───────────────────────────────────────────
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(30, 30, 30);
+      pdf.text('Reporte de Alineamiento de Tesis', margin, y);
+      y += 7;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(120, 120, 120);
+      const fechaGeneracion = new Date().toLocaleDateString('es-PE', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      });
+      pdf.text(
+        `Generado el ${fechaGeneracion}  ·  Evaluado el ${formatDate(report.created_at)}`,
+        margin, y,
+      );
+      y += 5;
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(margin, y, pageW - margin, y);
+      y += 9;
+
+      // ── Idea de tesis ─────────────────────────────────────────
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(120, 120, 120);
+      pdf.text('IDEA DE TESIS EVALUADA', margin, y);
+      y += 5;
+
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'italic');
+      pdf.setTextColor(40, 40, 40);
+      const ideaLines = pdf.splitTextToSize(`"${report.thesis_idea}"`, contentW);
+      checkPageBreak(ideaLines.length * 5 + 4);
+      pdf.text(ideaLines, margin, y);
+      y += ideaLines.length * 5 + 6;
+
+      // ── Score y nivel ─────────────────────────────────────────
+      pdf.setFontSize(13);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(30, 30, 30);
+      pdf.text(`Score de alineamiento: ${report.score_pct} / 100  ·  ${levelText}`, margin, y);
+      y += 9;
+
+      // ── Skill bars ────────────────────────────────────────────
+      if (json.skill_bars && json.skill_bars.length > 0) {
+        checkPageBreak(14);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(120, 120, 120);
+        pdf.text('HABILIDADES EVALUADAS', margin, y);
+        y += 5;
+
+        for (const bar of json.skill_bars) {
+          checkPageBreak(8);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(60, 60, 60);
+          pdf.text(`${bar.name}`, margin + 4, y);
+          pdf.setTextColor(100, 100, 100);
+          pdf.text(`${bar.percentage}%`, pageW - margin - 10, y);
+          y += 5;
+        }
+        y += 4;
+      }
+
+      // ── Fortalezas ────────────────────────────────────────────
+      if (json.student_strengths && json.student_strengths.length > 0) {
+        checkPageBreak(14);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(120, 120, 120);
+        pdf.text('FORTALEZAS', margin, y);
+        y += 5;
+
+        for (const str of json.student_strengths) {
+          const lines = pdf.splitTextToSize(`• ${str.replace(/^- /, '')}`, contentW - 8);
+          checkPageBreak(lines.length * 4.5 + 3);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(60, 60, 60);
+          pdf.text(lines, margin + 4, y);
+          y += lines.length * 4.5 + 2;
+        }
+        y += 4;
+      }
+
+      // ── Brechas criticas ──────────────────────────────────────
+      if (json.skill_gaps && json.skill_gaps.length > 0) {
+        checkPageBreak(14);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(120, 120, 120);
+        pdf.text('BRECHAS CRITICAS', margin, y);
+        y += 5;
+
+        for (const gap of json.skill_gaps) {
+          const lines = pdf.splitTextToSize(`• ${gap.replace(/^- /, '')}`, contentW - 8);
+          checkPageBreak(lines.length * 4.5 + 3);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(60, 60, 60);
+          pdf.text(lines, margin + 4, y);
+          y += lines.length * 4.5 + 2;
+        }
+        y += 4;
+      }
+
+      // ── Cursos relevantes ─────────────────────────────────────
+      if (json.relevant_courses && json.relevant_courses.length > 0) {
+        checkPageBreak(14);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(120, 120, 120);
+        pdf.text('CURSOS RELEVANTES', margin, y);
+        y += 5;
+
+        for (const course of json.relevant_courses) {
+          const lines = pdf.splitTextToSize(`• ${course.name}${course.relevance ? ` — ${course.relevance}` : ''}`, contentW - 8);
+          checkPageBreak(lines.length * 4.5 + 3);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(60, 60, 60);
+          pdf.text(lines, margin + 4, y);
+          y += lines.length * 4.5 + 2;
+        }
+        y += 4;
+      }
+
+      // ── Skills del CV ─────────────────────────────────────────
+      if (json.relevant_cv_skills && json.relevant_cv_skills.length > 0) {
+        checkPageBreak(14);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(120, 120, 120);
+        pdf.text('SKILLS DEL CV', margin, y);
+        y += 5;
+
+        const skillList = json.relevant_cv_skills
+          .map(s => s.indexOf(':') > 0 ? s.substring(0, s.indexOf(':')) : s)
+          .join('  ·  ');
+        const skillLines = pdf.splitTextToSize(skillList, contentW - 8);
+        checkPageBreak(skillLines.length * 4.5 + 4);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(60, 60, 60);
+        pdf.text(skillLines, margin + 4, y);
+        y += skillLines.length * 4.5 + 6;
+      }
+
+      // ── Justificacion ─────────────────────────────────────────
+      checkPageBreak(14);
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(margin, y, pageW - margin, y);
+      y += 6;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(120, 120, 120);
+      pdf.text('JUSTIFICACION DEL ANALISIS', margin, y);
+      y += 6;
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(9);
+      pdf.setTextColor(60, 60, 60);
+      const justLines = pdf.splitTextToSize(report.justification, contentW - 4);
+      checkPageBreak(justLines.length * 4.5 + 4);
+      pdf.text(justLines, margin, y);
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      pdf.save(`reporte-alineamiento-${dateStr}.pdf`);
+    } catch (err) {
+      console.error('Error al generar PDF:', err);
+      alert('Ocurrio un error al generar el PDF. Revisa la consola para mas detalles.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const pillStyle = getPillClass(report.alignment_level);
 
@@ -288,11 +487,12 @@ export function AlignmentReportDetails({ report }: AlignmentReportDetailsProps) 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center gap-2.5 mt-1 pb-4">
         <button
-          onClick={() => alert('Descargando PDF...')}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-[0.65rem] px-[1.25rem] bg-bg-surface text-text-primary border-[1.5px] border-border rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all duration-150 hover:bg-bg-hover hover:border-border-focus dark:bg-dark-bg-surface dark:text-dark-text-primary dark:border-dark-border dark:hover:bg-dark-bg-hover dark:hover:border-dark-border-focus"
+          onClick={handleExportPDF}
+          disabled={isExporting}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-[0.65rem] px-[1.25rem] bg-bg-surface text-text-primary border-[1.5px] border-border rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all duration-150 hover:bg-bg-hover hover:border-border-focus disabled:opacity-60 disabled:cursor-not-allowed dark:bg-dark-bg-surface dark:text-dark-text-primary dark:border-dark-border dark:hover:bg-dark-bg-hover dark:hover:border-dark-border-focus"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[15px] h-[15px] text-white/80"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descargar Reporte PDF
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[15px] h-[15px]"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          {isExporting ? 'Generando...' : 'Descargar Reporte PDF'}
         </button>
       </div>
 
