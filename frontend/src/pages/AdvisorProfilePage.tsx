@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Link as LinkIcon, BookOpen, FileText, Calendar, BarChart2, X } from 'lucide-react';
+import {
+	BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+	PieChart, Pie, Cell,
+} from 'recharts';
 import { advisorApi } from '../api/advisorApi';
 import { publicationApi } from '../api/publicationApi';
 import type { Publication } from '../api/publicationApi';
@@ -22,6 +26,210 @@ const getPubType = (type: string | null) => {
 	if (!type) return { label: 'Otro', colorClass: 'text-text-secondary bg-bg-surface border-border' };
 	return PUB_TYPE_MAP[type] || { label: type, colorClass: 'text-text-secondary bg-bg-surface border-border' };
 };
+
+const DONUT_COLORS = ['#5B8DEF', '#3D8B5E', '#C4893D', '#8B5CF6', '#C44545', '#4F6D7A', '#EC4899'];
+const TOOLTIP_STYLE = {
+	background: 'var(--color-bg-surface)', border: '1px solid var(--color-border)',
+	borderRadius: '8px', fontSize: '12px',
+};
+
+function AdvisorStatsPanel({ advisor, publications, theses, oldestYear }: {
+	advisor: Advisor; publications: Publication[]; theses: Thesis[]; oldestYear: number | null;
+}) {
+	// 1. Production by year
+	const yearData = useMemo(() => {
+		const map = new Map<number, { year: number; pubs: number; tesis: number }>();
+		for (const p of publications) {
+			if (!p.year) continue;
+			const e = map.get(p.year) || { year: p.year, pubs: 0, tesis: 0 };
+			e.pubs++;
+			map.set(p.year, e);
+		}
+		for (const t of theses) {
+			if (!t.year) continue;
+			const e = map.get(t.year) || { year: t.year, pubs: 0, tesis: 0 };
+			e.tesis++;
+			map.set(t.year, e);
+		}
+		return [...map.values()].sort((a, b) => a.year - b.year);
+	}, [publications, theses]);
+
+	// 2. Publications by type
+	const typeData = useMemo(() => {
+		const map = new Map<string, number>();
+		for (const p of publications) {
+			const label = getPubType(p.type).label;
+			map.set(label, (map.get(label) || 0) + 1);
+		}
+		return [...map.entries()]
+			.map(([name, value]) => ({ name, value }))
+			.sort((a, b) => b.value - a.value);
+	}, [publications]);
+
+	// 3. Degree level distribution
+	const degreeData = useMemo(() => {
+		const map = new Map<string, number>();
+		for (const t of theses) {
+			const key = t.degree_name || t.degree_level || 'No especificado';
+			map.set(key, (map.get(key) || 0) + 1);
+		}
+		return [...map.entries()]
+			.map(([name, value]) => ({ name, value }))
+			.sort((a, b) => b.value - a.value);
+	}, [theses]);
+
+	// 4. Top journals
+	const journalData = useMemo(() => {
+		const map = new Map<string, number>();
+		for (const p of publications) {
+			if (!p.journal) continue;
+			map.set(p.journal, (map.get(p.journal) || 0) + 1);
+		}
+		return [...map.entries()]
+			.map(([name, value]) => ({ name, value }))
+			.sort((a, b) => b.value - a.value)
+			.slice(0, 5);
+	}, [publications]);
+
+	const maxJournal = journalData[0]?.value || 1;
+
+	return (
+		<div className="space-y-5 mb-8 animate-fade-in-up">
+			{/* Stat cards */}
+			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+				<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 text-center">
+					<div className="text-3xl font-bold font-serif text-accent mb-1">{advisor.external_publications_count}</div>
+					<div className="text-sm text-text-muted">Publicaciones totales</div>
+				</div>
+				<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 text-center">
+					<div className="text-3xl font-bold font-serif text-emerald-500 dark:text-emerald-400 mb-1">{advisor.thesis_count}</div>
+					<div className="text-sm text-text-muted">Tesis asesoradas</div>
+				</div>
+				<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 text-center">
+					<div className="text-3xl font-bold font-serif text-yellow-500 dark:text-yellow-400 mb-1">
+						{oldestYear ? new Date().getFullYear() - oldestYear : '-'}
+					</div>
+					<div className="text-sm text-text-muted">Años de experiencia</div>
+				</div>
+			</div>
+
+			{/* Charts row 1: Production by Year + Pubs by Type */}
+			<div className="grid gap-5 md:grid-cols-2">
+				{/* Production by Year */}
+				{yearData.length > 0 && (
+					<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5">
+						<h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+							Producción por Año
+						</h4>
+						<ResponsiveContainer width="100%" height={200}>
+							<BarChart data={yearData}>
+								<XAxis dataKey="year" tick={{ fontSize: 10, fill: '#8E8E9E' }} axisLine={false} tickLine={false} />
+								<YAxis hide />
+								<Tooltip contentStyle={TOOLTIP_STYLE} />
+								<Bar dataKey="pubs" name="Publicaciones" fill="#5B8DEF" radius={[4, 4, 0, 0]} />
+								<Bar dataKey="tesis" name="Tesis" fill="#3D8B5E" radius={[4, 4, 0, 0]} />
+							</BarChart>
+						</ResponsiveContainer>
+						<div className="mt-2 flex justify-center gap-5">
+							<div className="flex items-center gap-1.5 text-[11px] text-text-secondary dark:text-dark-text-secondary">
+								<div className="h-2 w-2 rounded-full bg-[#5B8DEF]" /> Publicaciones
+							</div>
+							<div className="flex items-center gap-1.5 text-[11px] text-text-secondary dark:text-dark-text-secondary">
+								<div className="h-2 w-2 rounded-full bg-[#3D8B5E]" /> Tesis
+							</div>
+						</div>
+					</div>
+				)}
+
+				{/* Publications by Type */}
+				{typeData.length > 0 && (
+					<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5">
+						<h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+							Publicaciones por Tipo
+						</h4>
+						<ResponsiveContainer width="100%" height={180}>
+							<PieChart>
+								<Pie data={typeData} cx="50%" cy="50%" innerRadius={45} outerRadius={70}
+									paddingAngle={3} dataKey="value">
+									{typeData.map((_, i) => (
+										<Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+									))}
+								</Pie>
+								<Tooltip contentStyle={TOOLTIP_STYLE} />
+							</PieChart>
+						</ResponsiveContainer>
+						<div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
+							{typeData.slice(0, 5).map((e, i) => (
+								<div key={e.name} className="flex items-center gap-1.5 text-[11px] text-text-secondary dark:text-dark-text-secondary">
+									<div className="h-2 w-2 rounded-full" style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
+									{e.name}
+								</div>
+							))}
+						</div>
+					</div>
+				)}
+			</div>
+
+			{/* Charts row 2: Degree Level + Top Journals */}
+			<div className="grid gap-5 md:grid-cols-2">
+				{/* Degree Level Distribution */}
+				{degreeData.length > 0 && (
+					<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5">
+						<h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+							Nivel de Grado Asesorado
+						</h4>
+						<ResponsiveContainer width="100%" height={180}>
+							<PieChart>
+								<Pie data={degreeData} cx="50%" cy="50%" innerRadius={0} outerRadius={70}
+									paddingAngle={2} dataKey="value">
+									{degreeData.map((_, i) => (
+										<Cell key={i} fill={DONUT_COLORS[(i + 2) % DONUT_COLORS.length]} />
+									))}
+								</Pie>
+								<Tooltip contentStyle={TOOLTIP_STYLE} />
+							</PieChart>
+						</ResponsiveContainer>
+						<div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
+							{degreeData.map((e, i) => (
+								<div key={e.name} className="flex items-center gap-1.5 text-[11px] text-text-secondary dark:text-dark-text-secondary">
+									<div className="h-2 w-2 rounded-full" style={{ background: DONUT_COLORS[(i + 2) % DONUT_COLORS.length] }} />
+									{e.name} ({e.value})
+								</div>
+							))}
+						</div>
+					</div>
+				)}
+
+				{/* Top Journals */}
+				{journalData.length > 0 && (
+					<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5">
+						<h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+							Journals Frecuentes
+						</h4>
+						<div className="space-y-3">
+							{journalData.map((j, i) => (
+								<div key={j.name}>
+									<div className="flex justify-between text-[11px] mb-0.5">
+										<span className="truncate text-text-secondary dark:text-dark-text-secondary pr-2" title={j.name}>
+											{j.name}
+										</span>
+										<span className="font-semibold text-text-primary dark:text-dark-text-primary shrink-0">
+											{j.value}
+										</span>
+									</div>
+									<div className="h-1.5 rounded-full bg-bg-surface dark:bg-dark-bg-surface">
+										<div className="h-full rounded-full transition-all duration-700"
+											style={{ width: `${(j.value / maxJournal) * 100}%`, background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+				)}
+			</div>
+		</div>
+	);
+}
 
 const AdvisorProfilePage: React.FC = () => {
 	const { id } = useParams();
@@ -45,14 +253,14 @@ const AdvisorProfilePage: React.FC = () => {
 		Promise.all([
 			advisorApi.getAdvisorById(id),
 			advisorApi.getOldestThesisYear(id).catch(() => null),
-			publicationApi.getPublications(id).catch(() => []),
-			thesisApi.getTheses(id).catch(() => [])
-		]).then(([adv, year, pubs, ths]) => {
+			publicationApi.getPublications({ advisor_id: id }).catch(() => ({ items: [], total: 0 })),
+			thesisApi.getTheses({ advisor_id: id }).catch(() => ({ items: [], total: 0 }))
+		]).then(([adv, year, pubsRes, thsRes]) => {
 			if (mounted) {
 				setAdvisor(adv);
 				setOldestYear(year);
-				setPublications(pubs);
-				setTheses(ths);
+				setPublications(pubsRes.items);
+				setTheses(thsRes.items);
 				setLoading(false);
 			}
 		});
@@ -186,24 +394,7 @@ const AdvisorProfilePage: React.FC = () => {
 				</div>
 
 				{/* STATS PANEL */}
-				{showStats && (
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 animate-fade-in-up">
-						<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 text-center">
-							<div className="text-3xl font-bold font-serif text-accent mb-1">{advisor.external_publications_count}</div>
-							<div className="text-sm text-text-muted">Publicaciones totales</div>
-						</div>
-						<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 text-center">
-							<div className="text-3xl font-bold font-serif text-emerald-500 dark:text-emerald-400 mb-1">{advisor.thesis_count}</div>
-							<div className="text-sm text-text-muted">Tesis asesoradas</div>
-						</div>
-						<div className="bg-bg-surface-alt dark:bg-dark-bg-surface-alt border border-border dark:border-dark-border rounded-xl p-5 text-center">
-							<div className="text-3xl font-bold font-serif text-yellow-500 dark:text-yellow-400 mb-1">
-								{oldestYear ? new Date().getFullYear() - oldestYear : '-'}
-							</div>
-							<div className="text-sm text-text-muted">Años de experiencia</div>
-						</div>
-					</div>
-				)}
+				{showStats && <AdvisorStatsPanel advisor={advisor} publications={publications} theses={theses} oldestYear={oldestYear} />}
 
 				{/* TABS */}
 				<div className="flex gap-1 border-b border-border dark:border-dark-border mb-6">
