@@ -5,6 +5,15 @@ import type { DbStats } from '../types/student';
 import { useState, useEffect } from 'react';
 import { getStats } from '../api/statsApi';
 
+// Dashboard components
+import CreditProgress from '../components/home/CreditProgress';
+import GpaEvolution from '../components/home/GpaEvolution';
+import AlignmentCard from '../components/home/AlignmentCard';
+import TopResearchAreas from '../components/home/TopResearchAreas';
+import PublicationsByType from '../components/home/PublicationsByType';
+
+import TopThesisSubjects from '../components/home/TopThesisSubjects';
+
 const PIE_COLORS = ['#5B8DEF', '#3D8B5E'];
 
 export default function HomePage() {
@@ -50,10 +59,13 @@ export default function HomePage() {
 	];
 
 	return (
-		<div className="mx-auto max-w-7xl">
+		<div className="mx-auto max-w-7xl space-y-8">
+
+
 			<div className="grid gap-8 lg:grid-cols-3">
-				{/* Left: Student card */}
-				<div className="lg:col-span-1">
+				{/* Left column: Student card + Credit progress */}
+				<div className="space-y-6 lg:col-span-1">
+					{/* Student card */}
 					<div className="rounded-2xl border border-border bg-bg-surface p-6 dark:border-dark-border dark:bg-dark-bg-surface">
 						{/* Profile header */}
 						<div className="mb-5 flex items-center gap-4">
@@ -91,9 +103,15 @@ export default function HomePage() {
 							</p>
 						</div>
 					</div>
+
+					{/* Credit Progress */}
+					<CreditProgress credits={user.resumen_creditos} />
+
+					{/* Alignment Card */}
+					<AlignmentCard />
 				</div>
 
-				{/* Right: Stats + dashboard */}
+				{/* Right column: Stats + dashboards */}
 				<div className="space-y-6 lg:col-span-2">
 					{loading || !stats ? (
 						<div className="flex h-full min-h-75 items-center justify-center rounded-2xl border border-border bg-bg-surface p-6 dark:border-dark-border dark:bg-dark-bg-surface">
@@ -128,7 +146,7 @@ export default function HomePage() {
 								</div>
 							</div>
 
-							{/* Charts */}
+							{/* Original Charts */}
 							<div className="grid gap-5 md:grid-cols-2">
 								{/* Bar chart */}
 								<div className="rounded-2xl border border-border bg-bg-surface p-5 dark:border-dark-border dark:bg-dark-bg-surface">
@@ -199,6 +217,21 @@ export default function HomePage() {
 							</div>
 						</>
 					)}
+
+					{/* GPA Evolution */}
+					<GpaEvolution
+						periodos={user.periodos_academicos}
+						promedioGlobal={user.resumen_creditos.promedio_ponderado}
+					/>
+
+					{/* New dashboard charts row */}
+					<div className="grid gap-5 md:grid-cols-2">
+						<TopResearchAreas />
+						<PublicationsByType />
+					</div>
+
+					{/* Thesis subjects */}
+					<TopThesisSubjects />
 				</div>
 			</div>
 		</div>
