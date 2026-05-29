@@ -8,6 +8,7 @@ import type { AlignmentReport } from '../../types/alignment';
 import ErrorBanner from '../../components/ui/ErrorBanner';
 import Button from '../../components/ui/Button';
 import SafeAreaView from '../../components/ui/SafeAreaView';
+import ThesisIdeaModal from '../../components/ui/ThesisIdeaModal';
 
 function LevelBadge({ level }: { level: string }) {
   const colorMap: Record<string, { bg: string; text: string }> = {
@@ -121,6 +122,37 @@ export default function AlineamientoScreen() {
   const [idea, setIdea] = useState(user?.thesis_idea || '');
   const [error, setError] = useState<string | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showThesisModal, setShowThesisModal] = useState(false);
+
+  // Guard: no thesis idea
+  if (!user?.thesis_idea) {
+    return (
+      <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+        {showThesisModal && (
+          <ThesisIdeaModal
+            onClose={() => setShowThesisModal(false)}
+            onSuccess={() => setShowThesisModal(false)}
+          />
+        )}
+        <View className="flex-1 items-center justify-center px-8 gap-5">
+          <View className="w-16 h-16 rounded-full bg-yellow-500/10 items-center justify-center">
+            <Feather name="lock" size={28} color="#C4893D" />
+          </View>
+          <Text className="text-xl font-bold text-foreground text-center">Idea de tesis requerida</Text>
+          <Text className="text-sm text-muted text-center leading-5">
+            Para generar reportes de alineamiento necesitas primero registrar tu idea de tesis.
+          </Text>
+          <Pressable
+            onPress={() => setShowThesisModal(true)}
+            className="flex-row items-center gap-2 py-3 px-6 rounded-full bg-primary"
+          >
+            <Feather name="book-open" size={16} color="white" />
+            <Text className="text-sm font-semibold text-white">Insertar idea de tesis</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   useEffect(() => {
     if (studentId && token) {
