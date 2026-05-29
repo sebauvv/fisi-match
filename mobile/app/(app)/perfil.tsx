@@ -71,7 +71,9 @@ function parseCvText(text: string): CvSection[] {
 }
 
 function CvDisplay({ cvText }: { cvText: string }) {
+	const [isExpanded, setIsExpanded] = useState(false);
 	const sections = parseCvText(cvText);
+
 	if (!sections.length) {
 		return (
 			<Text className="text-sm text-muted">
@@ -79,36 +81,52 @@ function CvDisplay({ cvText }: { cvText: string }) {
 			</Text>
 		);
 	}
+
+	const visibleSections = isExpanded ? sections : sections.slice(0, 1);
+
 	return (
 		<View className="gap-4">
-			{sections.map((section) => (
+			{visibleSections.map((section) => (
 				<View key={section.header}>
 					<Text className="text-xs font-bold uppercase tracking-wide text-primary mb-2">
 						{section.header}
 					</Text>
-					<View className="gap-1.5">
+					<View className="gap-2">
 						{section.items.map((item, i) => {
 							const colonIdx = item.indexOf(':');
+							// Render "Title: Content" vertically stacked
 							if (colonIdx > 0 && colonIdx < 50) {
 								const key = item.slice(0, colonIdx).trim();
 								const val = item.slice(colonIdx + 1).trim();
 								return (
-									<View key={i} className="flex-row items-start gap-2">
-										<Text className="text-xs font-semibold text-foreground shrink-0">{key}:</Text>
-										<Text className="text-xs text-foreground-secondary flex-1 leading-4">{val}</Text>
+									<View key={i} className="gap-0.5">
+										<Text className="text-xs font-semibold text-foreground">{key}:</Text>
+										<Text className="text-xs text-foreground-secondary leading-5">{val}</Text>
 									</View>
 								);
 							}
+							// Standard bullet point
 							return (
 								<View key={i} className="flex-row items-start gap-2">
-									<View className="w-1.5 h-1.5 rounded-full bg-primary mt-1 shrink-0" />
-									<Text className="text-xs text-foreground-secondary flex-1 leading-4">{item}</Text>
+									<View className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+									<Text className="text-xs text-foreground-secondary flex-1 leading-5">{item}</Text>
 								</View>
 							);
 						})}
 					</View>
 				</View>
 			))}
+
+			{sections.length > 1 && (
+				<Pressable
+					onPress={() => setIsExpanded(!isExpanded)}
+					className="py-2.5 items-center justify-center border-t border-border/40 mt-1"
+				>
+					<Text className="text-xs font-medium text-primary">
+						{isExpanded ? 'Ver menos' : `Ver todo (${sections.length - 1} más)`}
+					</Text>
+				</Pressable>
+			)}
 		</View>
 	);
 }
