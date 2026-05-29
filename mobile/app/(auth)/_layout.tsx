@@ -3,10 +3,11 @@ import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function AuthLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, skipAuthRedirect } = useAuth();
 
   if (isLoading) return <LoadingSpinner />;
-  if (isAuthenticated) return <Redirect href="/(app)/home" />;
+  if (isAuthenticated && !skipAuthRedirect) return <Redirect href="/(app)/home" />;
+
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

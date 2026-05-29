@@ -164,16 +164,17 @@ export default function PerfilScreen() {
 			});
 			updateUser({
 				estudiante: {
-					nombres_apellidos: updated.nombres_apellidos ?? nombre,
-					codigo_matricula: updated.codigo_matricula ?? codigo,
-					facultad: updated.facultad ?? facultad,
-					escuela: updated.escuela ?? escuela,
-					plan: updated.plan ?? plan,
+					nombres_apellidos: updated.estudiante.nombres_apellidos,
+					codigo_matricula: updated.estudiante.codigo_matricula,
+					facultad: updated.estudiante.facultad,
+					escuela: updated.estudiante.escuela,
+					plan: updated.estudiante.plan,
 				},
 			});
 			setEditPersonal(false);
+
 		} catch {
-			// fallo silencioso
+			console.error('Error al actualizar el perfil');
 		} finally {
 			setSaving(false);
 		}

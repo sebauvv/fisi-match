@@ -92,14 +92,20 @@ function FilePicker({ label, file, onPick, onClear }: {
 }
 
 // Step 5: Confirm & Edit
+type PendingAuth = { user: AuthUser; token: string };
+
 function StepConfirm({
 	profile,
+	pendingAuth,
 	onConfirm,
 }: {
 	profile: StudentProfile;
-	onConfirm: () => void;
+	pendingAuth: PendingAuth;
+	onConfirm: (auth: PendingAuth, edits: { nombres_apellidos: string; codigo_matricula: string; facultad: string; escuela: string; plan: string; cv_text: string }) => void;
 }) {
-	const { user, token, updateUser } = useAuth();
+	const { user: ctxUser } = useAuth();
+	const user = pendingAuth.user;
+	const token = pendingAuth.token;
 	const [showCourses, setShowCourses] = useState(false);
 	const [editPersonal, setEditPersonal] = useState(false);
 	const [editCV, setEditCV] = useState(false);
@@ -141,35 +147,9 @@ function StepConfirm({
 		{ label: 'Plan de estudios', value: plan, setter: setPlan },
 	];
 
-	const handleConfirm = async () => {
-		if (token && user?.student_id) {
-			setSaving(true);
-			try {
-				const updated = await updateStudent(user.student_id, token, {
-					nombres_apellidos: nombre,
-					codigo_matricula: codigo,
-					facultad,
-					escuela,
-					plan,
-					cv_text: editableCvText,
-				});
-				updateUser({
-					estudiante: {
-						nombres_apellidos: updated.nombres_apellidos ?? nombre,
-						codigo_matricula: updated.codigo_matricula ?? codigo,
-						facultad: updated.facultad ?? facultad,
-						escuela: updated.escuela ?? escuela,
-						plan: updated.plan ?? plan,
-					},
-					cv_text: updated.cv_text ?? editableCvText,
-				});
-			} catch {
-				// fallo silencioso: continua de todos modos
-			} finally {
-				setSaving(false);
-			}
-		}
-		onConfirm();
+	const handleConfirm = () => {
+		// Llamamos onConfirm con los datos editados; el padre hará el updateStudent + login
+		onConfirm(pendingAuth, { nombres_apellidos: nombre, codigo_matricula: codigo, facultad, escuela, plan, cv_text: editableCvText });
 	};
 
 	return (
@@ -305,7 +285,9 @@ export default function RegisterScreen() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 	const [profileData, setProfileData] = useState<StudentProfile | null>(null);
-	const { login } = useAuth();
+	// pendingAuth: guardamos token+user SIN llamar login() para no activar isAuthenticated
+	const [pendingAuth, setPendingAuth] = useState<PendingAuth | null>(null);
+	const { login, setSkipAuthRedirect } = useAuth();
 
 	const handleProcessPDFs = async () => {
 		if (!historial || !cv) return;
@@ -319,7 +301,7 @@ export default function RegisterScreen() {
 
 			try {
 				const authRes = await loginStudent(email, password);
-				const user: AuthUser = {
+				const authUser: AuthUser = {
 					student_id: authRes.student_id,
 					email: authRes.email,
 					estudiante: profile.historial.estudiante,
@@ -329,12 +311,17 @@ export default function RegisterScreen() {
 					thesis_idea: '',
 					pdf_urls: profile.pdf_urls,
 				};
-				login(user, authRes.access_token);
+				// No se debe llamar a login() aquí: activaría isAuthenticated y el AuthLayout
+				// redireccionaría a home antes de que el paso 5 se muestre.
+				setPendingAuth({ user: authUser, token: authRes.access_token });
 			} catch {
-				console.error('Auto-login fallido');
+				console.error('Pre-login fallido');
 			}
 
+			// Bloqueamos el redirect del AuthLayout para que el paso 5 pueda mostrarse
+			setSkipAuthRedirect(true);
 			setStep(5);
+
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Error al procesar los PDFs');
 		} finally {
@@ -456,7 +443,7 @@ export default function RegisterScreen() {
 					)}
 
 					{/* Step 5: Confirm */}
-					{step === 5 && profileData && (
+					{step === 5 && profileData && pendingAuth && (
 						<View className="gap-0">
 							<View className="items-center mb-6">
 								<View className="w-14 h-14 rounded-full bg-success-soft items-center justify-center mb-3">
@@ -469,7 +456,32 @@ export default function RegisterScreen() {
 							</View>
 							<StepConfirm
 								profile={profileData}
-								onConfirm={() => router.replace('/(app)/home')}
+								pendingAuth={pendingAuth}
+								onConfirm={async (auth, edits) => {
+									// 1. Guarda ediciones en el backend
+									try {
+										await updateStudent(auth.user.student_id, auth.token, edits);
+									} catch {
+										console.error('Fallo al guardar ediciones');
+									}
+									// 2. Ahora sí se activa la sesión → el AuthLayout redirigirá a home
+									const finalUser: AuthUser = {
+										...auth.user,
+										estudiante: {
+											...auth.user.estudiante,
+											nombres_apellidos: edits.nombres_apellidos,
+											codigo_matricula: edits.codigo_matricula,
+											facultad: edits.facultad,
+											escuela: edits.escuela,
+											plan: edits.plan,
+										},
+										cv_text: edits.cv_text,
+									};
+									// Liberar el bloqueo ANTES de login para que el AuthLayout
+									// pueda redirigir en cuanto isAuthenticated cambie a true
+									setSkipAuthRedirect(false);
+									login(finalUser, auth.token);
+								}}
 							/>
 						</View>
 					)}

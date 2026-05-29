@@ -13,6 +13,8 @@ interface AuthContextType {
   updateUser: (patch: Partial<AuthUser>) => void;
   isAuthenticated: boolean;
   isLoading: boolean;
+  skipAuthRedirect: boolean;
+  setSkipAuthRedirect: (v: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -21,6 +23,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Cuando es true, el AuthLayout NO redirige aunque isAuthenticated sea true.
+  // Usado por el registro para que el paso 5 (Confirm) pueda mostrarse antes de ir a home.
+  const [skipAuthRedirect, setSkipAuthRedirect] = useState(false);
 
   useEffect(() => {
     AsyncStorage.multiGet([USER_KEY, TOKEN_KEY]).then(([userEntry, tokenEntry]) => {
@@ -54,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, updateUser, isAuthenticated: !!user, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser, isAuthenticated: !!user, isLoading, skipAuthRedirect, setSkipAuthRedirect }}>
       {children}
     </AuthContext.Provider>
   );
