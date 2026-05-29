@@ -15,7 +15,15 @@ export async function getStudent(studentId: string, token: string): Promise<Auth
 export async function updateStudent(
   studentId: string,
   token: string,
-  data: Partial<{ thesis_idea: string; cv_text: string }>,
+  data: Partial<{
+    thesis_idea: string;
+    cv_text: string;
+    nombres_apellidos: string;
+    codigo_matricula: string;
+    facultad: string;
+    escuela: string;
+    plan: string;
+  }>,
 ) {
   const response = await fetch(`${API_BASE}/students/${studentId}`, {
     method: 'PUT',
