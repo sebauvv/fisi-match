@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, TextInput, Pressable, ScrollView,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { advisorApi } from '../../api/advisorApi';
 import type { Advisor, ResearchArea } from '../../types/advisor';
 import AdvisorCard from '../../components/ui/AdvisorCard';
@@ -17,6 +18,7 @@ const ALPHABET = [
 ];
 
 export default function ExploradorScreen() {
+  const router = useRouter();
   const [mode, setMode] = useState<Mode>('name');
   const [query, setQuery] = useState('');
   const [orcidFilter, setOrcidFilter] = useState<boolean | null>(null);
@@ -172,7 +174,7 @@ export default function ExploradorScreen() {
               keyExtractor={(a) => a.id}
               contentContainerClassName="px-4 pb-4 pt-2"
               renderItem={({ item }) => (
-                <AdvisorCard advisor={item} onPress={(a) => console.log('View advisor', a.id)} />
+                <AdvisorCard advisor={item} onPress={(a) => router.push(`/asesor/${a.id}`)} />
               )}
               ListEmptyComponent={
                 <View className="py-12 items-center">

@@ -7,15 +7,16 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function AppLayout() {
 	const { isAuthenticated, isLoading } = useAuth();
-
-	if (isLoading) return <LoadingSpinner />;
-	if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
-
+	
+	// React Hooks MUST be called before any early returns
 	const background = useCSSVariable('--color-background') as string | undefined;
 	const surface = useCSSVariable('--color-surface') as string | undefined;
 	const border = useCSSVariable('--color-border') as string | undefined;
 	const primary = useCSSVariable('--color-primary') as string | undefined;
 	const muted = useCSSVariable('--color-muted') as string | undefined;
+
+	if (isLoading) return <LoadingSpinner />;
+	if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
 	const tabBarStyle = useMemo(
 		() => ({

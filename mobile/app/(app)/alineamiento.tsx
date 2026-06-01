@@ -124,6 +124,15 @@ export default function AlineamientoScreen() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [showThesisModal, setShowThesisModal] = useState(false);
 
+  // Hooks MUST be called before any early returns (Rules of Hooks)
+  useEffect(() => {
+    if (studentId && token) {
+      alignmentApi.getAlignmentReports(studentId, token)
+        .then(setReports)
+        .catch((e) => setError(e.message));
+    }
+  }, [studentId, token]);
+
   // Guard: no thesis idea
   if (!user?.thesis_idea) {
     return (
@@ -153,15 +162,6 @@ export default function AlineamientoScreen() {
       </SafeAreaView>
     );
   }
-
-  useEffect(() => {
-    if (studentId && token) {
-      alignmentApi.getAlignmentReports(studentId, token)
-        .then(setReports)
-        .catch((e) => setError(e.message));
-    }
-  }, [studentId, token]);
-
   const handleGenerate = async () => {
     if (!studentId || !token || !idea.trim()) return;
     setIsGenerating(true);

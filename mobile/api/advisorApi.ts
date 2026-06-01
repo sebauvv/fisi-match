@@ -36,4 +36,11 @@ export const advisorApi = {
     }
     return response.json();
   },
+
+  async getOldestThesisYear(advisorId: string): Promise<number | null> {
+    const response = await fetch(`${API_BASE}/advisors/${advisorId}/oldest-thesis-year`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.year;
+  },
 };
