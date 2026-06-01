@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import type { AcademicPeriod } from '../../types/student';
 
@@ -7,8 +8,8 @@ interface CoursesModalProps {
 }
 
 export default function CoursesModal({ periods, onClose }: CoursesModalProps) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="relative flex max-h-[85vh] w-full max-w-4xl flex-col rounded-2xl bg-bg-surface shadow-2xl dark:bg-dark-bg-surface">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4 dark:border-dark-border">
@@ -71,6 +72,7 @@ export default function CoursesModal({ periods, onClose }: CoursesModalProps) {
           ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

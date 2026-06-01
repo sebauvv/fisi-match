@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import { BookOpen, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -30,8 +31,8 @@ export default function ThesisIdeaModal({ onClose, onSuccess, onError }: ThesisI
 			// Local session update
 			updateUser({ thesis_idea: idea });
 			onSuccess();
-		} catch (e: any) {
-			const errorMsg = e.message || 'Error al guardar la idea de tesis';
+		} catch (e: unknown) {
+			const errorMsg = e instanceof Error ? e.message : 'Error al guardar la idea de tesis';
 			setError(errorMsg);
 			onError(errorMsg);
 		} finally {
@@ -39,8 +40,8 @@ export default function ThesisIdeaModal({ onClose, onSuccess, onError }: ThesisI
 		}
 	};
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+	return createPortal(
+		<div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in">
 			<div className="bg-bg-surface dark:bg-dark-bg-surface w-full max-w-lg rounded-2xl border border-border dark:border-dark-border shadow-2xl flex flex-col p-6 animate-fade-in-up">
 
 				<div className="flex items-center gap-3 mb-2 text-accent">
@@ -83,6 +84,7 @@ export default function ThesisIdeaModal({ onClose, onSuccess, onError }: ThesisI
 					</button>
 				</div>
 			</div>
-		</div>
+		</div>,
+		document.body
 	);
 }
